@@ -19,9 +19,9 @@ extern "C" {
   
   /* This structure contains the cloud field information */
   typedef struct {
-    rfftwnd_plan fft_plan;      /* The initial inverse 3D transform */
-    rfftwnd_plan fft_plan_2d_1; /* The forward 2D transforms */
-    rfftwnd_plan fft_plan_2d_2; /* The inverse 2D transforms */
+    fftw_plan fft_plan;         /* The initial inverse 3D transform */
+    fftw_plan fft_plan_2d_1;    /* The forward 2D transforms */
+    fftw_plan fft_plan_2d_2;    /* The inverse 2D transforms */
     complex *p[CG_MAX_VARS];    /* Fourier components (size (nx/2+1)*ny*nz) */
     real *field[CG_MAX_VARS];   /* Output field (points to same memory as p) */
     real *kx, *ky, *kz; /* wavenumber vectors */

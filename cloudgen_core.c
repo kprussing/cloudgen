@@ -52,20 +52,13 @@ cg_new_multi_field(int nx, int ny, int nz,
      for a full complex fft. */
   long int len = (nx/2+1) * ny * nz;
   
-  rfftwnd_plan fft_plan = rfftw3d_create_plan(nz, ny, nx,
-	FFTW_COMPLEX_TO_REAL, FFTW_ESTIMATE | FFTW_IN_PLACE);
-  rfftwnd_plan fft_plan_2d_1 = rfftw2d_create_plan(ny, nx,
-	FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE | FFTW_IN_PLACE);
-  rfftwnd_plan fft_plan_2d_2 = rfftw2d_create_plan(ny, nx,
-	FFTW_COMPLEX_TO_REAL, FFTW_ESTIMATE | FFTW_IN_PLACE);
+  int planar_rank = 2;
+  int planar_shape[] = {ny, nx};
+  int planar_size_c = ny * (nx/2 + 1);
+  int planar_size_r = ny * 2 * (nx / 2 + 1);
 
   /* Check range of nvars */
   if (nvars < 1 || nvars > CG_MAX_VARS) {
-    return NULL;
-  }
-
-  if (!fft_plan || !fft_plan_2d_1 || !fft_plan_2d_2) {
-    /* Out of memory or incorrect arguments to rfftw3d_create_plan */
     return NULL;
   }
 
@@ -80,7 +73,7 @@ cg_new_multi_field(int nx, int ny, int nz,
   for (i = 0; i < nvars; i++) {
     int j;
     /* Allocate memory for the Fourier components */
-    field->p[i] = malloc(len * sizeof(complex));
+    field->p[i] = fftw_malloc(len * sizeof(complex));
     if (!field->p[i]) {
       /* Out of memory */
       for (j = 0; j < i; j++) {
@@ -98,6 +91,21 @@ cg_new_multi_field(int nx, int ny, int nz,
     field->p[i] = NULL;
   }
 
+  fftw_plan fft_plan = fftw_plan_dft_c2r_3d(nz, ny, nx, field->p[0], field->field[0], FFTW_ESTIMATE);
+  fftw_plan fft_plan_2d_1 = fftw_plan_many_dft_r2c(planar_rank, planar_shape, nz,
+                                            field->field[0], NULL, 1, planar_size_r,
+                                            field->p[0], NULL, 1, planar_size_c,
+                                            FFTW_ESTIMATE);
+  fftw_plan fft_plan_2d_2 = fftw_plan_many_dft_c2r(planar_rank, planar_shape, nz,
+                                            field->p[0], NULL, 1, planar_size_c,
+                                            field->field[0], NULL, 1, planar_size_r,
+                                            FFTW_ESTIMATE);
+
+  if (!fft_plan || !fft_plan_2d_1 || !fft_plan_2d_2) {
+    /* Out of memory or incorrect arguments to fftw_create_plan */
+    return NULL;
+  }
+
   /* Allocate memory for x and y wavenumbers */
   kx = malloc(nx * sizeof(real));
   ky = malloc(ny * sizeof(real));
@@ -108,7 +116,7 @@ cg_new_multi_field(int nx, int ny, int nz,
 
   if (!kx || !ky || !kz || !x || !y || !z) {
     /* Out of memory */
-    free(field);
+    fftw_free(field);
     return NULL;
   }
 
@@ -179,11 +187,11 @@ cg_delete_field(cg_field *field)
     return;
   }
   if (field->fft_plan) {
-    rfftwnd_destroy_plan(field->fft_plan);
+    fftw_destroy_plan(field->fft_plan);
   }
   for (i = 0; i < field->nvars; i++) {
     if (field->p[i]) {
-      free(field->p[i]);
+      fftw_free(field->p[i]);
     }
   }
   if (field->kx) {
@@ -262,13 +270,11 @@ cg_power_law(cg_field *field, int ivar, real outer_scale,
 	  /* Region IV: quasi-1D behaviour (z) */
 	  value = coefft_IV * pow(kk, slope*0.25);
 	}
-	target->re *= value;
-	target->im *= value;
+	*target *= CMPLX(value, value);
       }
     }
   }
-  p->re = 0.0;
-  p->im = 0.0;
+  *p = CMPLX(0.0, 0.0);
 }
 
 /* Set the mean spectral energy density - a power law with a scale
@@ -340,15 +346,13 @@ cg_power_laws(cg_field *field, real outer_scale,
 	    /* Region IV: quasi-1D behaviour (z) */
 	    value = coefft_IV * pow(kk, slope[n]*0.25);
 	  }
-	  p[n][index].re *= value;
-	  p[n][index].im *= value;
+	  p[n][index] *= value;
 	}
       }
     }
   }
   for (n = 0; n < field->nvars; n++) {
-    p[n][0].re = 0.0;
-    p[n][0].im = 0.0;
+    p[n][0] = CMPLX(0.0, 0.0);
   }
 }
 
@@ -360,12 +364,10 @@ cg_unity_phase(cg_field *field, int ivar)
   complex *p = field->p[ivar];
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
-  p[0].re = 0.0;
-  p[0].im = 0.0;
+  p[0] = CMPLX(0.0, 0.0);
 
   for (n = 1; n < len; n++) {
-    p[n].re = 1.0;
-    p[n].im = 0.0;
+    p[n] = CMPLX(1.0, 0.0);
   }
 }
 
@@ -378,12 +380,10 @@ cg_random_phase(cg_field *field, int ivar)
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
 
-  p[0].re = 0.0;
-  p[0].im = 0.0;
+  p[0] = CMPLX(0.0, 0.0);
 
   for (n = 1; n < len; n++) {
-    p[n].re = gaussian_deviate();
-    p[n].im = gaussian_deviate();
+    p[n] = CMPLX(gaussian_deviate(), gaussian_deviate());
   }
 }
 
@@ -397,14 +397,12 @@ cg_correlated_phase(cg_field *field, int ivar, int iorig, real correlation)
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
 
-  p[0].re = 0.0;
-  p[0].im = 0.0;
+  p[0] = CMPLX(0.0, 0.0);
 
   if (correlation <= 0.0) {
     /* Use completely new random numbers */
     for (n = 1; n < len; n++) {
-      p[n].re = gaussian_deviate();
-      p[n].im = gaussian_deviate();
+      p[n] = CMPLX(gaussian_deviate(), gaussian_deviate());
     }
   }
   else if (correlation >= 1.0) {
@@ -416,10 +414,9 @@ cg_correlated_phase(cg_field *field, int ivar, int iorig, real correlation)
        and those from another variable */
     real comp_correlation = 1.0-correlation;
     for (n = 1; n < len; n++) {
-      p[n].re = correlation * p_orig[n].re
-	+ comp_correlation * gaussian_deviate();
-      p[n].im = correlation * p_orig[n].im
-	+ comp_correlation * gaussian_deviate();
+      p[n] = correlation * p_orig[n]
+          + comp_correlation * CMPLX(gaussian_deviate(),
+                                     gaussian_deviate());
     }
   }
 }
@@ -432,7 +429,7 @@ cg_generate_fractal(cg_field *field)
 {
   int n;
   for (n = 0; n < field->nvars; n++) {
-    rfftwnd_one_complex_to_real(field->fft_plan, field->p[n], NULL);
+    fftw_execute_dft_c2r(field->fft_plan, field->p[n], field->field[n]);
   }
 
   return field->field[0];

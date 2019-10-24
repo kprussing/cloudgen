@@ -5,6 +5,9 @@
 
 #include "cloudgen.h"
 
+#include <tgmath.h>
+#include <stdlib.h>
+
 #define PI 3.14159265358979323846
 #define PI2 6.28318530717958647692
 
@@ -13,13 +16,9 @@
 void
 cg_transform_layers(cg_field *field)
 {
-  int k, n;
+  int n;
   for (n = 0; n < field->nvars; n++) {
-    for (k = 0; k < field->nz; k++) {
-      rfftwnd_one_real_to_complex(field->fft_plan_2d_1,
-				  field->field[n]+k*field->ny*(field->nx+2),
-				  NULL);
-    }
+    fftw_execute_dft_r2c(field->fft_plan_2d_1, field->field[n], field->p[n]);
   }
 }
 
@@ -28,13 +27,9 @@ cg_transform_layers(cg_field *field)
 void
 cg_revert_layers(cg_field *field)
 {
-  int k, n;
+  int n;
   for (n = 0; n < field->nvars; n++) {
-    for (k = 0; k < field->nz; k++) {
-      rfftwnd_one_complex_to_real(field->fft_plan_2d_2,
-				  field->p[n]+k*field->ny*(field->nx/2+1),
-				  NULL);
-    }
+    fftw_execute_dft_c2r(field->fft_plan_2d_2, field->p[n], field->field[n]);
   }
 }
 
@@ -64,8 +59,7 @@ cg_change_slope_layers(cg_field *field, int ivar, real outer_scale,
 	if (kk > kk_outer) {
 	  int index = i + (nx/2+1)*(j + ny*k);
 	  real scaling = pow(kk/kk_outer, power);
-	  p[index].re *= scaling;
-	  p[index].im *= scaling;
+	  p[index] *= scaling;
 	}
       }
     }
@@ -112,8 +106,7 @@ cg_anisotropic_change_slope_layers(cg_field *field, int ivar,
 	if (kk > kk_outer) {
 	  int index = i + (nx/2+1)*(j + ny*k);
 	  real scaling = pow(kk/kk_outer, power);
-	  p[index].re *= scaling;
-	  p[index].im *= scaling;
+	  p[index] *= scaling;
 	}
       }
     }
@@ -138,11 +131,10 @@ cg_translate_layers(cg_field *field, real *deltax, real *deltay)
       for (j = 0; j < ny; j++) {
 	for (i = 0; i < (nx/2+1); i++) {
 	  int index = i + (nx/2+1)*(j + ny*k);
-	  real angle = atan2(p[index].im, p[index].re);
-	  real amp = sqrt(p[index].re*p[index].re + p[index].im*p[index].im);
+	  real angle = carg(p[index]);
+	  real amp = fabs(p[index]);
 	  angle -= PI2 * (kx[i] * deltax[k] + ky[j] * deltay[k]);
-	  p[index].re = amp * cos(angle);
-	  p[index].im = amp * sin(angle);
+	  p[index] = amp * CMPLX(cos(angle), sin(angle));
 	}
       }
     }
@@ -230,7 +222,7 @@ cg_interpolate_layers(cg_field *field, real *height, real *param, int n)
   if (!height || !param) {
     return NULL;
   }
-  if (!(new_param = malloc(field->nz * sizeof(real)))) {
+  if (!(new_param = fftw_malloc(field->nz * sizeof(real)))) {
     return NULL;
   }
 
@@ -275,8 +267,8 @@ cg_get_layer_displacements(cg_field *field, real *fall_speed,
   if (!fall_speed) {
     return 0;
   }
-  new_deltax = malloc(field->nz * sizeof(real));
-  new_deltay = malloc(field->nz * sizeof(real));
+  new_deltax = fftw_malloc(field->nz * sizeof(real));
+  new_deltay = fftw_malloc(field->nz * sizeof(real));
   if (!new_deltax || !new_deltay) {
     return 0;
   }
