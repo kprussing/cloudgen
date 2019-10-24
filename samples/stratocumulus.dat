@@ -1,0 +1,141 @@
+# This is a configuration file for "cloudgen", for the generation of
+# stochastic cloud fields - just run "cloudgen stratocumulus.dat". The
+# output is written to a NetCDF file named "out.nc" by default.
+
+# The file format is simple: a set of parameter-value pairs, where
+# value can be a boolean, a number, an array of numbers or a
+# string. Any of the parameters can be overridden on the command line
+# with cloudgen parameter="value" stratocumulus.dat.  "Parameter" is
+# case insensitive.
+
+# The "verbose" parameter is a boolean which determines whether
+# progress information is reported by the program.  It is treated as
+# "false" if it is either not present, or it is present and set to 0
+# or "false". If it is set and is any other value (including just the
+# name of the variable being present) then it is regarded as "true".
+verbose
+
+
+## DOMAIN SETTINGS
+
+# Set the domain size in metres - note that the y domain is
+# automatically the same size as the x domain.
+x_domain_size 200000
+z_domain_size 1000
+
+# Number of pixels in each direction - note that the y domain
+# automatically has the same number of pixels as the x domain.
+x_pixels 256
+z_pixels 64
+
+# The output file contains x, y and z variables, which can be offset
+# from the origin using the following:
+#x_offset 0
+#y_offset 0
+z_offset 0
+
+
+## RANDOM NUMBER GENERATOR
+
+# To generate different cloud fields we use random phases in calls to
+# the first inverse Fourier transform.  By using a "seed" the same
+# sequence of random numbers will be produced and the same cloud field
+# generated - remember that this value can be overwritten on the
+# command line
+seed 2
+
+# Later Linux kernels provide a device file from which random bits can
+# be read that can be used to seed the random number generator and
+# produce different cloud fields every time:
+#system_random_file /dev/random
+
+
+## 3D SPECTRAL PROPERTIES 
+
+# Exponent of the power spectrum in the vertical direction.
+#vertical_exponent -1.667
+vertical_exponent -1.8
+
+# The power spectrum becomes flat at scales larger than "outer_scale"
+# metres.
+outer_scale 30000
+
+
+## HEIGHT DEPENDENT PROPERTIES
+
+# All the height-dependent parameters are entered on the same grid,
+# the at the heights in the "interp_height" vector. They are
+# interpolated on to the domain grid. If interp_height is not present
+# then none of the height dependent properties will be implemented
+interp_height 0 700 800 900
+
+# For horizontal displacement, this can either be specified
+# explicitly:
+x_displacement 0 2000 2200 2600
+y_displacement 0 500 550 600
+
+# ...or it can be calculated from an x-y wind profile (in metres per
+# second), a cloud particle fall speed profile (in metres per second)
+# and a "generating level" in metres which is usually near cloud
+# top. Of course, this is only meaningful for cirrus.
+#v_wind 10 15 20 25 30 35 40 40
+#u_wind 5 2.5 0 -1 0 2.5 5 5
+#fall_speed 1 0.9 0.8 0.7 0.6 0.5 0.4 0.3
+#generating_level 9500
+
+# You can scale the wind as follows - this is useful to test the
+# dependence on wind shear
+#wind_scale_factor 1
+
+# The height variation of the exponent of the horizontal power
+# spectrum can be specified here
+#horizontal_exponent -1.667
+horizontal_exponent -1.8
+
+# The mixing represented by a change in the horizontal exponent may be
+# anisotropic - i.e. smoother in direction of orientation of the
+# fallstreak with respect to the generating level: just set the
+# boolean "anisotropic_mixing".
+#anisotropic_mixing
+
+
+## SCALING THE FIELD
+
+# The distribution is either Gaussian or lognormal, determined by the
+# boolean "lognormal_distribution". Gaussian for stratocumulus, then
+# negative values indicate subsaturated air
+#lognormal_distribution
+
+# The distribution is scaled using the vectors "mean" and
+# "standard_deviation". In the case of a lognormal distribution,
+# standard_deviation is actually the fractional standard deviation,
+# i.e. the standard deviation of the natural logarithm of the field.
+#mean -1.6 0.8 -0.8 -2
+#standard_deviation .3
+mean -1.2 0.6 -0.6 -1.5
+standard_deviation .2
+
+
+# A minimum value can be defined using "threshold" - if set, values
+# beneath this will be set to missing_value.
+threshold 0.0
+missing_value 0.0
+
+
+## OUTPUT OF THE DATA
+
+# Where to write the data
+output_filename lwc.nc
+
+# Variable name in the file
+variable_name lwc   
+
+# Attributes of the variable
+long_name Liquid water content
+units g m-3   
+
+# Global attributes
+#comment Insert comment here
+#references Information on the data can be found at ...
+#institution University of Reading
+title 3D stochastic field of liquid water content

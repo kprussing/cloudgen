@@ -1,0 +1,40 @@
+This directory contains sample configuration files for "cloudgen". To
+run the program on file.dat, simply type "cloudgen file.dat". The
+files in this directory are:
+
+cirrus.dat
+  An idealised case, with all the parameters described in the
+  comments. A stochastic field of ice water content is generated.
+  Note that this file is not based on real observations.
+
+cirrus_with_effective_radius.dat
+  The same idealised case but demonstrating how effective radius may
+  be generated with a specified correlation to ice water content.
+
+1999*.dat
+  Four cases derived from the 94-GHz cloud radar at Chilbolton in
+  southern England, with progressively increasing domain-mean water
+  content. They do not produce effective radius fields. Three of
+  these cases were used by Hogan and Kew (2005) to estimate the
+  radiative effects of cirrus inhomogeneity. The fourth (19990717.dat)
+  was used in a conference paper by Hogan and Kew (2004).
+
+1999*_nomixing.dat
+  The same cases but with the standard deviations and spectral
+  exponents adjusted to remove the homogenising effects of wind
+  shear.
+
+stratocumulus.dat
+  An idealised stratocumulus case, with all the parameters described
+  in the comments. A stochastic field of liquid water content is
+  generated. Note that this file is not based on real observations.
+
+generate_cases_varying_windshear.sh
+  A shell script for generating sets of cirrus simulations with
+  different wind shears; this shows how configuration parameters may
+  be overridden on the command line.
+
+generate_nomixing_varying_windshear.sh
+  The same but using the 199*_nomixing.dat input data files.
+
+
