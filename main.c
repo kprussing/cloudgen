@@ -9,21 +9,10 @@
 #include "readconfig.h"
 #include "random.h"
 #include "nctools.h"
-#include "version.h"
+
+#include "config.h"
 
 char verbose = 0;
-
-/* Ensure that the NetCDF functions appropriate for the size of "real"
-   are used */
-#ifdef FFTW_ENABLE_FLOAT
-#define NC_PUT_ATT_REAL nc_put_att_float
-#define NC_PUT_VAR_REAL nc_put_var_float
-#define NC_PUT_VARA_REAL nc_put_vara_float
-#else
-#define NC_PUT_ATT_REAL nc_put_att_double
-#define NC_PUT_VAR_REAL nc_put_var_double
-#define NC_PUT_VARA_REAL nc_put_vara_double
-#endif
 
 /* Send a message to standard output if verbose is true.  */
 static
@@ -206,7 +195,7 @@ main(int argc, char **argv)
   char is_threshold = 0;
   char is_size = 0;
   int is_mean = 0;
-  char *version = "Cloudgen version " CLOUDGEN_VERSION;
+  char *version = "Cloudgen version " PROJECT_VERSION;
   char *confstring = NULL;
   size_t start[3] = {0, 0, 0};
   size_t count[3] = {1, 1, 0};
@@ -249,7 +238,7 @@ main(int argc, char **argv)
 
   /* See if -version or -help are on the command line. */
   if (rc_get_boolean(config, "version")) {
-    fprintf(stdout, "Cloudgen " CLOUDGEN_VERSION "\n");
+    fprintf(stdout, "Cloudgen " PROJECT_VERSION "\n");
     exit(0);
   }
   else if (rc_get_boolean(config, "help")) {
@@ -268,7 +257,7 @@ main(int argc, char **argv)
     exit(1);
   }
   else {
-    chat("Cloudgen " CLOUDGEN_VERSION ": compiled to use single-precision internally");
+    chat("Cloudgen " PROJECT_VERSION ": compiled to use single-precision internally");
   }
 #else
   if (sizeof(real) != 8) {
@@ -276,7 +265,7 @@ main(int argc, char **argv)
     exit(1);
   }
   else {
-    chat("Cloudgen " CLOUDGEN_VERSION ": compiled to use double-precision internally");
+    chat("Cloudgen " PROJECT_VERSION ": compiled to use double-precision internally");
   }
 #endif
 

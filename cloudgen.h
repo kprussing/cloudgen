@@ -10,9 +10,10 @@ extern "C" {
 
   /* This code uses the same precision as the fftw library;
      single-precision is sufficiently accurate. */
-#include <rfftw.h>
-#define real fftw_real
-#define complex fftw_complex
+#include <complex.h>
+#include <fftw3.h>
+
+#include "config.h"
 
 #define CG_MAX_VARS 16
   

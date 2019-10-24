@@ -45,6 +45,16 @@ if (NOT netCDF_FOUND)
     endif()
 endif()
 
+option(USE_FLOAT "Use single precision values" Off)
+if (USE_FLOAT)
+    add_definitions(-DFFTW_ENABLE_FLOAT)
+    set(fftw_lib FFTW::Float)
+else()
+    set(fftw_lib FFTW::Double)
+endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 add_executable(cloudgen
     cloudgen_core.c
     cloudgen_layers.c
@@ -64,7 +74,10 @@ target_compile_options(cloudgen
         -pedantic
     >
 )
-target_link_libraries(cloudgen FFTW::Double netcdf)
+target_include_directories(cloudgen
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+target_link_libraries(cloudgen ${fftw_lib} netcdf)
 
 include(GNUInstallDirs)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/cloudgen)

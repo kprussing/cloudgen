@@ -1,0 +1,41 @@
+#ifndef @PROJECT_NAME@_CONFIG_H
+#define @PROJECT_NAME@_CONFIG_H
+
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define PROJECT_VERSION  "@PROJECT_VERSION@"
+#define PROJECT_VERSION_MAJOR "@PROJECT_VERSION_MAJOR@"
+#define PROJECT_VERSION_MINOR "@PROJECT_VERSION_MINOR@"
+#define PTOJECT_VERSION_PATCH "@PROJECT_VERSION_PATCH@"
+
+/* Ensure that the functions appropriate for the size of "real"
+   are used */
+#undef complex
+
+#ifdef FFTW_ENABLE_FLOAT
+#define real float
+#define complex float _Complex
+
+#define NC_PUT_ATT_REAL nc_put_att_float
+#define NC_PUT_VAR_REAL nc_put_var_float
+#define NC_PUT_VARA_REAL nc_put_vara_float
+
+#define fftw_plan fftwf_plan
+#define fftw_malloc fftwf_malloc
+#define fftw_free fftwf_free
+#define fftw_plan_dft_c2r_3d fftwf_plan_dft_c2r_3d
+#define fftw_plan_many_dft_r2c fftwf_plan_many_dft_r2c
+#define fftw_plan_many_dft_c2r fftwf_plan_many_dft_c2r
+#define fftw_destroy_plan fftwf_destroy_plan
+#define fftw_execute_dft_c2r fftwf_execute_dft_c2r
+#define fftw_execute_dft_r2c fftwf_execute_dft_r2c
+#else
+#define real double
+#define complex double _Complex
+
+#define NC_PUT_ATT_REAL nc_put_att_double
+#define NC_PUT_VAR_REAL nc_put_var_double
+#define NC_PUT_VARA_REAL nc_put_vara_double
+
+#endif
+
+#endif
