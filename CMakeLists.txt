@@ -20,7 +20,6 @@ if (NOT FFTW_FOUND)
         SOURCE_DIR        "external/findFFTW"
         BINARY_DIR        ""
         INSTALL_DIR       ""
-        PATCH_COMMAND     git apply ${CMAKE_CURRENT_SOURCE_DIR}/cmake/findFFTW.patch
     )
     FetchContent_GetProperties(fftw_cmake)
     if (NOT fftw_cmake_POPULATED)
