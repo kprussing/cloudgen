@@ -63,6 +63,8 @@ add_executable(cloudgen
     main.c
 )
 
+set_property(TARGET cloudgen PROPERTY C_STANDARD 11)
+
 set(C_COMPILER_ID ${CMAKE_C_COMPILER_ID})
 target_compile_options(cloudgen
     PUBLIC
