@@ -32,11 +32,10 @@ endif()
 find_package(netCDF QUIET)
 if (NOT netCDF_FOUND)
     FetchContent_Declare(netcdf4
-        GIT_REPOSITORY    "http://github.com/Unidata/netcdf-c.git"
-        GIT_TAG           af8f9ad2cf9a4dfa5788958691ddedf1bf1c6d94
+        GIT_REPOSITORY    "http://github.com/kprussing/netcdf-c.git"
+        GIT_TAG           feature/cmake-targets
         SOURCE_DIR        "external/netcdf4-c"
         CMAKE_ARGS        "-DBUILD_SHARED_LIBS=On -DENABLE_DOXYGEN=Off -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-        PATCH_COMMAND     git apply ${CMAKE_CURRENT_SOURCE_DIR}/cmake/netcdf.patch
     )
     FetchContent_GetProperties(netcdf4)
     if (NOT netcdf4_POPULATED)
