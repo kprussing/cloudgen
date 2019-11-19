@@ -34,7 +34,7 @@ if (NOT netCDF_FOUND)
     FetchContent_Declare(netcdf4
         GIT_REPOSITORY    "http://github.com/Unidata/netcdf-c.git"
         SOURCE_DIR        "external/netcdf4-c"
-        CMAKE_ARGS        "-DBUILD_SHARED_LIBS=On -DENABLE_DOXYGEN=Off"#-DENABLE_TESTS=Off"
+        CMAKE_ARGS        "-DBUILD_SHARED_LIBS=On -DENABLE_DOXYGEN=Off -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         PATCH_COMMAND     git apply ${CMAKE_CURRENT_SOURCE_DIR}/cmake/netcdf.patch
     )
     FetchContent_GetProperties(netcdf4)
