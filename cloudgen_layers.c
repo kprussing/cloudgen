@@ -134,7 +134,7 @@ cg_translate_layers(cg_field *field, real *deltax, real *deltay)
 	  real angle = carg(p[index]);
 	  real amp = fabs(p[index]);
 	  angle -= PI2 * (kx[i] * deltax[k] + ky[j] * deltay[k]);
-	  p[index] = amp * CMPLX(cos(angle), sin(angle));
+	  p[index] = amp * (cos(angle) + sin(angle) * I);
 	}
       }
     }

@@ -270,11 +270,11 @@ cg_power_law(cg_field *field, int ivar, real outer_scale,
 	  /* Region IV: quasi-1D behaviour (z) */
 	  value = coefft_IV * pow(kk, slope*0.25);
 	}
-	*target *= CMPLX(value, value);
+	*target *= value + value * I;
       }
     }
   }
-  *p = CMPLX(0.0, 0.0);
+  *p = 0.0 + 0.0 * I;
 }
 
 /* Set the mean spectral energy density - a power law with a scale
@@ -352,7 +352,7 @@ cg_power_laws(cg_field *field, real outer_scale,
     }
   }
   for (n = 0; n < field->nvars; n++) {
-    p[n][0] = CMPLX(0.0, 0.0);
+    p[n][0] = 0.0 + 0.0 * I;
   }
 }
 
@@ -364,10 +364,10 @@ cg_unity_phase(cg_field *field, int ivar)
   complex *p = field->p[ivar];
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
-  p[0] = CMPLX(0.0, 0.0);
+  p[0] = 0.0 + 0.0 * I;
 
   for (n = 1; n < len; n++) {
-    p[n] = CMPLX(1.0, 0.0);
+    p[n] = 1.0 + 0.0 * I;
   }
 }
 
@@ -380,10 +380,10 @@ cg_random_phase(cg_field *field, int ivar)
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
 
-  p[0] = CMPLX(0.0, 0.0);
+  p[0] = 0.0 + 0.0 * I;
 
   for (n = 1; n < len; n++) {
-    p[n] = CMPLX(gaussian_deviate(), gaussian_deviate());
+    p[n] = gaussian_deviate() + gaussian_deviate() * I;
   }
 }
 
@@ -397,12 +397,12 @@ cg_correlated_phase(cg_field *field, int ivar, int iorig, real correlation)
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
 
-  p[0] = CMPLX(0.0, 0.0);
+  p[0] = 0.0 + 0.0 * I;
 
   if (correlation <= 0.0) {
     /* Use completely new random numbers */
     for (n = 1; n < len; n++) {
-      p[n] = CMPLX(gaussian_deviate(), gaussian_deviate());
+      p[n] = gaussian_deviate() + gaussian_deviate() * I;
     }
   }
   else if (correlation >= 1.0) {
@@ -415,8 +415,7 @@ cg_correlated_phase(cg_field *field, int ivar, int iorig, real correlation)
     real comp_correlation = 1.0-correlation;
     for (n = 1; n < len; n++) {
       p[n] = correlation * p_orig[n]
-          + comp_correlation * CMPLX(gaussian_deviate(),
-                                     gaussian_deviate());
+          + comp_correlation * (gaussian_deviate() + gaussian_deviate() * I);
     }
   }
 }
