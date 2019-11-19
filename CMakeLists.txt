@@ -36,6 +36,7 @@ if (NOT netCDF_FOUND)
         GIT_TAG           af8f9ad2cf9a4dfa5788958691ddedf1bf1c6d94
         SOURCE_DIR        "external/netcdf4-c"
         CMAKE_ARGS        "-DBUILD_SHARED_LIBS=On -DENABLE_DOXYGEN=Off -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        PATCH_COMMAND     git apply ${CMAKE_CURRENT_SOURCE_DIR}/cmake/netcdf.patch
     )
     FetchContent_GetProperties(netcdf4)
     if (NOT netcdf4_POPULATED)
@@ -78,7 +79,7 @@ target_compile_options(cloudgen
 target_include_directories(cloudgen
     PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
-target_link_libraries(cloudgen ${fftw_lib} netcdf)
+target_link_libraries(cloudgen ${fftw_lib} netCDF::netcdf)
 
 include(GNUInstallDirs)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/cloudgen)
