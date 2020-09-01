@@ -18,7 +18,6 @@ if (NOT FFTW_FOUND)
         INSTALL_COMMAND   ""
         TEST_COMMAND      ""
         SOURCE_DIR        "external/findFFTW"
-        BINARY_DIR        ""
         INSTALL_DIR       ""
     )
     FetchContent_GetProperties(fftw_cmake)
