@@ -28,20 +28,7 @@ if (NOT FFTW_FOUND)
     find_package(FFTW REQUIRED)
 endif()
 
-find_package(netCDF QUIET)
-if (NOT netCDF_FOUND)
-    FetchContent_Declare(netcdf4
-        GIT_REPOSITORY    "http://github.com/kprussing/netcdf-c.git"
-        GIT_TAG           feature/cmake-targets
-        SOURCE_DIR        "external/netcdf4-c"
-        CMAKE_ARGS        "-DBUILD_SHARED_LIBS=On -DENABLE_DOXYGEN=Off -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    )
-    FetchContent_GetProperties(netcdf4)
-    if (NOT netcdf4_POPULATED)
-        FetchContent_Populate(netcdf4)
-        add_subdirectory(${netcdf4_SOURCE_DIR} ${netcdf4_BINARY_DIR})
-    endif()
-endif()
+find_package(netCDF REQUIRED)
 
 option(USE_FLOAT "Use single precision values" Off)
 if (USE_FLOAT)
