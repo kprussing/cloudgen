@@ -1,5 +1,6 @@
 /* main.c -- Create fractal cirrus clouds and save as NetCDF
    Copyright (C) 2003 Robin Hogan <r.j.hogan@reading.ac.uk> */
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
