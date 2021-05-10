@@ -101,7 +101,7 @@ rc_read(char *file_name, FILE *err_file)
     data = (rc_data *) malloc(sizeof(rc_data));
     if (!data) {
       if (err_file) {
-	fprintf(err_file, memory_error);
+	fprintf(err_file, "%s", memory_error);
       }
       return NULL;
     }
@@ -122,7 +122,7 @@ rc_read(char *file_name, FILE *err_file)
   data = malloc(sizeof(rc_data));
   if (!data) {
     if (err_file) {
-      fprintf(err_file, memory_error);
+      fprintf(err_file, "%s", memory_error);
     }
     fclose(file);
     return NULL;
@@ -149,7 +149,7 @@ rc_read(char *file_name, FILE *err_file)
       param = realloc(param, (++param_length)+1);
       if (!param) {
 	if (err_file) {
-	  fprintf(err_file, memory_error);
+	  fprintf(err_file, "%s", memory_error);
 	}
 	fclose(file);
 	return NULL;
@@ -174,7 +174,7 @@ rc_read(char *file_name, FILE *err_file)
 	  value = realloc(value, (++value_length)+1);
 	  if (!value) {
 	    if (err_file) {
-	      fprintf(err_file, memory_error);
+	      fprintf(err_file, "%s", memory_error);
 	    }
 	    fclose(file);
 	    return NULL;
@@ -193,7 +193,7 @@ rc_read(char *file_name, FILE *err_file)
 	    value = realloc(value, (++value_length)+1);
 	    if (!value) {
 	      if (err_file) {
-		fprintf(err_file, memory_error);
+		fprintf(err_file, "%s", memory_error);
 	      }
 	      fclose(file);
 	      return NULL;
@@ -208,7 +208,7 @@ rc_read(char *file_name, FILE *err_file)
     /* Register result */
     if (!__rc_register(data, param, value)) {
       if (err_file) {
-	fprintf(err_file, memory_error);
+	fprintf(err_file, "%s", memory_error);
       }
       fclose(file);
       return NULL;
