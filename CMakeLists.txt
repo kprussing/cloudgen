@@ -38,33 +38,44 @@ else()
     set(fftw_lib FFTW::Double)
 endif()
 
+find_package(BISON 3.0.1 REQUIRED)
+find_package(FLEX REQUIRED)
+
+flex_target(lexer parser.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.c)
+bison_target(parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c)
+add_flex_bison_dependency(lexer parser)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-add_executable(cloudgen
+add_library(cloudgen-lib OBJECT
     cloudgen_core.c
     cloudgen_layers.c
     readconfig.c
     random.c
     nctools.c
-    main.c
+    ${FLEX_lexer_OUTPUTS}
+    ${BISON_parser_OUTPUTS}
 )
-
-set_property(TARGET cloudgen PROPERTY C_STANDARD 11)
-
-set(C_COMPILER_ID ${CMAKE_C_COMPILER_ID})
-target_compile_options(cloudgen
+target_compile_options(cloudgen-lib
     PUBLIC
-    PRIVATE
-    $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:CLANG>>:
-        -Wall
-        -Wextra
-        -pedantic
-    >
+        $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:CLANG>>:
+            -Wall
+            -Wextra
+            -pedantic
+        >
 )
-target_include_directories(cloudgen
-    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+target_include_directories(cloudgen-lib
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
-target_link_libraries(cloudgen ${fftw_lib} netCDF::netcdf)
+target_link_libraries(cloudgen-lib PUBLIC ${fftw_lib} netCDF::netcdf)
+set_property(TARGET cloudgen-lib PROPERTY C_STANDARD 11)
+
+add_executable(cloudgen
+    main.c
+    $<TARGET_OBJECTS:cloudgen-lib>
+)
+target_link_libraries(cloudgen cloudgen-lib)
 
 include(GNUInstallDirs)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/cloudgen)

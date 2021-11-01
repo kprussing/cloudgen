@@ -6,6 +6,11 @@
 
 #include "readconfig.h"
 
+extern FILE * yyin;
+extern FILE * yyerr;
+extern int yyparse();
+extern rc_data * parsed_data;
+
 /* Move file pointer to the start of the next line, returning '\n' on
    success or EOF if the file ended first. */
 static
@@ -119,102 +124,19 @@ rc_read(char *file_name, FILE *err_file)
     }
     return NULL;
   }
-  data = malloc(sizeof(rc_data));
-  if (!data) {
-    if (err_file) {
-      fprintf(err_file, "%s", memory_error);
-    }
-    fclose(file);
-    return NULL;
-  }
 
-  while (!feof(file)) {
-    char *param = NULL, *value = NULL;
-    int param_length = 0, value_length = 0;
-    /* Skip whitespace */
-    c = __rc_skip_whitespace(file);
-    if (c == EOF) {
-      break;
-    }
-    else if (c == '#') {
-      __rc_skip_line(file);
-      continue;
-    }
-    else if (c == '\n') {
-      continue;
-    }
-
-    /* Read param name */
-    while (c > ' ' && c != '#' && c != EOF) {
-      param = realloc(param, (++param_length)+1);
-      if (!param) {
-	if (err_file) {
-	  fprintf(err_file, "%s", memory_error);
-	}
-	fclose(file);
-	return NULL;
-      }
-      param[param_length-1] = c;
-      c = fgetc(file);
-    }
-    ungetc(c, file);
-    param[param_length] = '\0';
-
-    /* Skip whitespace */
-    c = __rc_skip_whitespace(file);
-    if (c == '#') {
-      __rc_skip_line(file);
-    }
-    else if (c != '\n') {
-      /* Read value */
-      if ((c == '\'') || (c == '"')) {
-	int quote = c;
-	c = fgetc(file);
-	while (c != EOF && c != quote) {
-	  value = realloc(value, (++value_length)+1);
-	  if (!value) {
-	    if (err_file) {
-	      fprintf(err_file, "%s", memory_error);
-	    }
-	    fclose(file);
-	    return NULL;
-	  }
-	  value[value_length-1] = c;
-	  value[value_length] = '\0';
-	  c = fgetc(file);
-	}
-      }
-      else {
-	while (c != EOF && c != '\n') {
-	  if (c == '#') {
-	    __rc_skip_whitespace(file);
-	  }
-	  else if (c != '\r') {
-	    value = realloc(value, (++value_length)+1);
-	    if (!value) {
-	      if (err_file) {
-		fprintf(err_file, "%s", memory_error);
-	      }
-	      fclose(file);
-	      return NULL;
-	    }
-	    value[value_length-1] = c;
-	    value[value_length] = '\0';
-	  }
-	  c = fgetc(file);
-	}
-      }
-    }
-    /* Register result */
-    if (!__rc_register(data, param, value)) {
-      if (err_file) {
-	fprintf(err_file, "%s", memory_error);
-      }
-      fclose(file);
+  yyin = file;
+  yyerr = err_file;
+  if (yyparse() != 0) {
+    fprintf(err_file, "Error parsing %s\n", file_name);
+    if (parsed_data != NULL) {
+      free(parsed_data);
       return NULL;
     }
   }
+
   fclose(file);
+  data = parsed_data;
   return data;
 }
 
