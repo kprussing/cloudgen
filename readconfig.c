@@ -40,16 +40,15 @@ __rc_skip_whitespace(FILE *file)
 
 /* Find param in data, returning an element of the rc_data list, or
    NULL if not present. Note that the search is case insensitive. */
-static
 rc_data *
-__rc_find(rc_data *data, char *param)
+rc_find(rc_data *data, char *param)
 {
   if (data->param) {
     if (strcasecmp(param, data->param) == 0) {
       return data;
     }
     else if (data->next) {
-      return __rc_find(data->next, param);
+      return rc_find(data->next, param);
     }
   }
   return NULL;
@@ -306,7 +305,7 @@ rc_sprint(rc_data *data)
 int
 rc_exists(rc_data *data, char *param)
 {
-  return (__rc_find(data, param) != NULL);  
+  return (rc_find(data, param) != NULL);  
 }
 
 /* Interpret the value associated with param as a boolean, returning 1
@@ -317,7 +316,7 @@ rc_exists(rc_data *data, char *param)
 int
 rc_get_boolean(rc_data *data, char *param)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data) {
     return 0;
   }
@@ -347,7 +346,7 @@ rc_get_boolean(rc_data *data, char *param)
 int
 rc_get_int(rc_data *data, char *param, int *status)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data || !data->value) {
     *status = 0;
     return 0;
@@ -383,7 +382,7 @@ rc_assign_int(rc_data *data, char *param, int *value)
 real
 rc_get_real(rc_data *data, char *param, int *status)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data || !data->value) {
     *status = 0;
     return 0;
@@ -485,7 +484,7 @@ rc_assign_real_array_default(rc_data *data, char *param,
 char *
 rc_get_string(rc_data *data, char *param)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data || !data->value) {
     return NULL;
   }
@@ -544,7 +543,7 @@ int *
 rc_get_int_array(rc_data *data, char *param, int *length)
 {
   int *out = NULL;
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   *length = 0;
 
   if (!data || !data->value) {
@@ -577,7 +576,7 @@ real *
 rc_get_real_array(rc_data *data, char *param, int *length)
 {
   real *out = NULL;
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   *length = 0;
 
   if (!data || !data->value) {

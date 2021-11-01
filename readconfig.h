@@ -56,6 +56,10 @@ char *rc_sprint(rc_data *data);
 /* Return 1 if param exists in data, 0 otherwise. */
 int rc_exists(rc_data *data, char *param);
 
+/* Find param in data, returning an element of hte rc_data list, or
+   NULL if not present.  Notee that the search is case insensitive. */
+rc_data * rc_find(rc_data *data, char *param);
+
 /* Interpret the value associated with param as a boolean, returning 1
    if true and 0 if false. Note that 0 will be returned if param is
    not present, or if it exists and is "0", "no" or "false" (or any
