@@ -113,3 +113,5 @@ install(FILES
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
+enable_testing()
+add_subdirectory(test)
