@@ -43,6 +43,10 @@ file:
             rc_clear(parsed_data);
         }
         $$ = $1;
+        $$->next = (rc_data *) malloc(sizeof (rc_data));
+        $$->param = NULL;
+        $$->value = NULL;
+        $$->next = NULL;
         parsed_data = $$;
     }
 
