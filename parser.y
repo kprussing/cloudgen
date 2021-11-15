@@ -35,24 +35,28 @@ rc_data * parsed_data;
 %type <node> parameters
 %type <node> parameter
 
+%initial-action {
+if (parsed_data != NULL) {
+    rc_clear(parsed_data);
+}
+parsed_data = (rc_data *) malloc(sizeof (rc_data));
+parsed_data->param = NULL;
+parsed_data->value = NULL;
+parsed_data->next = NULL;
+}
+
 %%
 
 file:
     parameters
     {   rc_data * walker;
-        if (parsed_data != NULL) {
-            rc_clear(parsed_data);
-        }
-        $$ = $1;
-        walker = $$;
-        while (walker->next != NULL) {
+        walker = $1;
+        while (walker != NULL) {
+            rc_register(parsed_data, walker->param, walker->value);
             walker = walker->next;
         }
-        walker->next = (rc_data *) malloc(sizeof (rc_data));
-        walker->next->param = NULL;
-        walker->next->value = NULL;
-        walker->next->next = NULL;
-        parsed_data = $$;
+        rc_clear($1);
+        $$ = parsed_data;
     }
 
 parameters:
