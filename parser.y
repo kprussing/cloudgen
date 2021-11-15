@@ -39,14 +39,19 @@ rc_data * parsed_data;
 
 file:
     parameters
-    {   if (parsed_data != NULL) {
+    {   rc_data * walker;
+        if (parsed_data != NULL) {
             rc_clear(parsed_data);
         }
         $$ = $1;
-        $$->next = (rc_data *) malloc(sizeof (rc_data));
-        $$->param = NULL;
-        $$->value = NULL;
-        $$->next = NULL;
+        walker = $$;
+        while (walker->next != NULL) {
+            walker = walker->next;
+        }
+        walker->next = (rc_data *) malloc(sizeof (rc_data));
+        walker->next->param = NULL;
+        walker->next->value = NULL;
+        walker->next->next = NULL;
         parsed_data = $$;
     }
 
