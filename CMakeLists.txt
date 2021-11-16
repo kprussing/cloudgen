@@ -3,6 +3,17 @@ cmake_minimum_required(VERSION 3.6.1)
 cmake_policy(SET CMP0048 NEW)
 project(cloudgen VERSION 1.3 LANGUAGES C)
 
+include(GNUInstallDirs)
+if (NOT DEFINED INSTALL_CONFIGDIR)
+    if (CMAKE_SYSTEM_NAME MATCHES Windows)
+        set(INSTALL_CONFIGDIR CMake)
+    elseif (CMAKE_SYSTEM_NAME MATCHES Darwin)
+        set(INSTALL_CONFIGDIR ${PROJECT_NAME}.framework/Resources/CMake)
+    else()
+        set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+    endif()
+endif()
+
 # Preemptively load FetchContent for adding external dependencies
 include(FetchContent OPTIONAL RESULT_VARIABLE fc_LOADED)
 if (${fc_LOADED} MATCHES NOTFOUND)
@@ -26,6 +37,10 @@ if (NOT FFTW_FOUND)
         list(APPEND CMAKE_MODULE_PATH ${fftw_cmake_SOURCE_DIR})
     endif()
     find_package(FFTW REQUIRED)
+    install(FILES
+        ${fftw_cmake_SOURCE_DIR}/findFFTW.cmake
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
 endif()
 
 find_package(netCDF REQUIRED)
@@ -36,17 +51,6 @@ if (USE_FLOAT)
     set(fftw_lib FFTW::Float)
 else()
     set(fftw_lib FFTW::Double)
-endif()
-
-include(GNUInstallDirs)
-if (NOT DEFINED INSTALL_CONFIGDIR)
-    if (CMAKE_SYSTEM_NAME MATCHES Windows)
-        set(INSTALL_CONFIGDIR CMake)
-    elseif (CMAKE_SYSTEM_NAME MATCHES Darwin)
-        set(INSTALL_CONFIGDIR ${PROJECT_NAME}.framework/Resources/CMake)
-    else()
-        set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
-    endif()
 endif()
 
 find_package(BISON 3.0.1 REQUIRED)
@@ -130,20 +134,12 @@ configure_package_config_file(
     INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 
-#Install the config, configversion and custom find modules
+# Install the config, configversion and custom find modules
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
     DESTINATION ${INSTALL_CONFIGDIR}
 )
-
-# Install the findFFTW.cmake if we had to include it.
-if (DEFINED fftw_cmake_SOURCE_DIR)
-    install(FILES
-        ${fftw_cmake_SOURCE_DIR}/findFFTW.cmake
-        DESTINATION ${INSTALL_CONFIGDIR}
-    )
-endif()
 
 enable_testing()
 add_subdirectory(test)
