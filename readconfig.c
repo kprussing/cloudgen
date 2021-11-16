@@ -6,6 +6,11 @@
 
 #include "readconfig.h"
 
+extern FILE * yyin;
+extern FILE * yyerr;
+extern int yyparse();
+extern rc_data * parsed_data;
+
 /* Move file pointer to the start of the next line, returning '\n' on
    success or EOF if the file ended first. */
 static
@@ -35,16 +40,15 @@ __rc_skip_whitespace(FILE *file)
 
 /* Find param in data, returning an element of the rc_data list, or
    NULL if not present. Note that the search is case insensitive. */
-static
 rc_data *
-__rc_find(rc_data *data, char *param)
+rc_find(rc_data *data, char *param)
 {
   if (data->param) {
     if (strcasecmp(param, data->param) == 0) {
       return data;
     }
     else if (data->next) {
-      return __rc_find(data->next, param);
+      return rc_find(data->next, param);
     }
   }
   return NULL;
@@ -119,102 +123,19 @@ rc_read(char *file_name, FILE *err_file)
     }
     return NULL;
   }
-  data = malloc(sizeof(rc_data));
-  if (!data) {
-    if (err_file) {
-      fprintf(err_file, "%s", memory_error);
-    }
-    fclose(file);
-    return NULL;
-  }
 
-  while (!feof(file)) {
-    char *param = NULL, *value = NULL;
-    int param_length = 0, value_length = 0;
-    /* Skip whitespace */
-    c = __rc_skip_whitespace(file);
-    if (c == EOF) {
-      break;
-    }
-    else if (c == '#') {
-      __rc_skip_line(file);
-      continue;
-    }
-    else if (c == '\n') {
-      continue;
-    }
-
-    /* Read param name */
-    while (c > ' ' && c != '#' && c != EOF) {
-      param = realloc(param, (++param_length)+1);
-      if (!param) {
-	if (err_file) {
-	  fprintf(err_file, "%s", memory_error);
-	}
-	fclose(file);
-	return NULL;
-      }
-      param[param_length-1] = c;
-      c = fgetc(file);
-    }
-    ungetc(c, file);
-    param[param_length] = '\0';
-
-    /* Skip whitespace */
-    c = __rc_skip_whitespace(file);
-    if (c == '#') {
-      __rc_skip_line(file);
-    }
-    else if (c != '\n') {
-      /* Read value */
-      if ((c == '\'') || (c == '"')) {
-	int quote = c;
-	c = fgetc(file);
-	while (c != EOF && c != quote) {
-	  value = realloc(value, (++value_length)+1);
-	  if (!value) {
-	    if (err_file) {
-	      fprintf(err_file, "%s", memory_error);
-	    }
-	    fclose(file);
-	    return NULL;
-	  }
-	  value[value_length-1] = c;
-	  value[value_length] = '\0';
-	  c = fgetc(file);
-	}
-      }
-      else {
-	while (c != EOF && c != '\n') {
-	  if (c == '#') {
-	    __rc_skip_whitespace(file);
-	  }
-	  else if (c != '\r') {
-	    value = realloc(value, (++value_length)+1);
-	    if (!value) {
-	      if (err_file) {
-		fprintf(err_file, "%s", memory_error);
-	      }
-	      fclose(file);
-	      return NULL;
-	    }
-	    value[value_length-1] = c;
-	    value[value_length] = '\0';
-	  }
-	  c = fgetc(file);
-	}
-      }
-    }
-    /* Register result */
-    if (!__rc_register(data, param, value)) {
-      if (err_file) {
-	fprintf(err_file, "%s", memory_error);
-      }
-      fclose(file);
+  yyin = file;
+  yyerr = err_file;
+  if (yyparse() != 0) {
+    fprintf(err_file, "Error parsing %s\n", file_name);
+    if (parsed_data != NULL) {
+      free(parsed_data);
       return NULL;
     }
   }
+
   fclose(file);
+  data = parsed_data;
   return data;
 }
 
@@ -384,7 +305,7 @@ rc_sprint(rc_data *data)
 int
 rc_exists(rc_data *data, char *param)
 {
-  return (__rc_find(data, param) != NULL);  
+  return (rc_find(data, param) != NULL);  
 }
 
 /* Interpret the value associated with param as a boolean, returning 1
@@ -395,7 +316,7 @@ rc_exists(rc_data *data, char *param)
 int
 rc_get_boolean(rc_data *data, char *param)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data) {
     return 0;
   }
@@ -425,7 +346,7 @@ rc_get_boolean(rc_data *data, char *param)
 int
 rc_get_int(rc_data *data, char *param, int *status)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data || !data->value) {
     *status = 0;
     return 0;
@@ -461,7 +382,7 @@ rc_assign_int(rc_data *data, char *param, int *value)
 real
 rc_get_real(rc_data *data, char *param, int *status)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data || !data->value) {
     *status = 0;
     return 0;
@@ -563,7 +484,7 @@ rc_assign_real_array_default(rc_data *data, char *param,
 char *
 rc_get_string(rc_data *data, char *param)
 {
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   if (!data || !data->value) {
     return NULL;
   }
@@ -622,7 +543,7 @@ int *
 rc_get_int_array(rc_data *data, char *param, int *length)
 {
   int *out = NULL;
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   *length = 0;
 
   if (!data || !data->value) {
@@ -655,7 +576,7 @@ real *
 rc_get_real_array(rc_data *data, char *param, int *length)
 {
   real *out = NULL;
-  data = __rc_find(data, param);
+  data = rc_find(data, param);
   *length = 0;
 
   if (!data || !data->value) {
