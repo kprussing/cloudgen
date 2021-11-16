@@ -1,0 +1,14 @@
+get_filename_component(cloudgen_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${cloudgen_CMAKE_DIR})
+
+list(REMOVE_AT CMAKE_MODULE_PATH -1)
+
+find_package(FFTW REQUIRED)
+find_package(netCDF REQUIRED)
+
+if(NOT TARGET cloudgen::cloudgen)
+    include("${cloudgen_CMAKE_DIR}/cloudgenTargets.cmake")
+endif()
+

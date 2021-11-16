@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6.1)
 
 cmake_policy(SET CMP0048 NEW)
-project(Cloudgen VERSION 1.3 LANGUAGES C)
+project(cloudgen VERSION 1.3 LANGUAGES C)
 
 # Preemptively load FetchContent for adding external dependencies
 include(FetchContent OPTIONAL RESULT_VARIABLE fc_LOADED)
@@ -78,38 +78,49 @@ add_executable(cloudgen
 target_link_libraries(cloudgen cloudgen-lib)
 
 include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/cloudgen)
+if (NOT DEFINED INSTALL_CONFIGDIR)
+    if (CMAKE_SYSTEM_NAME MATCHES Windows)
+        set(INSTALL_CONFIGDIR CMake)
+    elseif (CMAKE_SYSTEM_NAME MATCHES Darwin)
+        set(INSTALL_CONFIGDIR ${PROJECT_NAME}.framework/Resources/CMake)
+    else()
+        set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+    endif()
+endif()
+
 install(TARGETS cloudgen
     EXPORT cloudgen-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(EXPORT cloudgen-targets
     FILE
-        CloudgenTargets.cmake
+        cloudgenTargets.cmake
     NAMESPACE
-        Cloudgen::
+        cloudgen::
     DESTINATION
         ${INSTALL_CONFIGDIR}
 )
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/CloudgenConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/CloudgenConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/CloudgenConfig.cmake
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/cloudgenConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
     INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 #Install the config, configversion and custom find modules
 install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/CloudgenConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/CloudgenConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
