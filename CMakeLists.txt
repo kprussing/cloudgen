@@ -89,7 +89,11 @@ target_include_directories(cloudgen
            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_link_libraries(cloudgen PUBLIC ${fftw_lib} netCDF::netcdf)
-set_property(TARGET cloudgen PROPERTY C_STANDARD 11)
+set_target_properties(cloudgen PROPERTIES
+    C_STANDARD 11
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 add_library(cloudgen::cloudgen ALIAS cloudgen)
 
 add_executable(executable main.c)
