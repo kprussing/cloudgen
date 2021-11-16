@@ -13,7 +13,6 @@ struct __rc_data {
     rc_data * next;
 };
 rc_data * rc_read(char * file_name, FILE * err_file);
-void rc_clear(rc_data * data);
 }
 
 pybind11::dict parse_input_file(pybind11::object path) {
@@ -64,7 +63,6 @@ pybind11::dict parse_input_file(pybind11::object path) {
         result[param] = value;
         walker = walker->next;
     }
-    rc_clear(data);
 
     return result;
 }
