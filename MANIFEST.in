@@ -1,0 +1,12 @@
+include COPYING MANIFEST.in noxfile.py pyproject.toml
+global-include CMakeLists.txt *.c *.h *.l *.y *.h.in
+recursive-include samples *.dat *.sh README
+
+graft cmake
+graft python
+
+prune bld
+prune .nox
+prune _skbuild
+prune python/*.egg-info
+global-exclude __pycache__ *.py[cod]

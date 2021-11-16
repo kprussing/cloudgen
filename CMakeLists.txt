@@ -147,3 +147,7 @@ install(FILES
 
 enable_testing()
 add_subdirectory(test)
+
+if (SKBUILD)
+    add_subdirectory(python)
+endif()
