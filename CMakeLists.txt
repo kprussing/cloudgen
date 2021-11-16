@@ -124,5 +124,13 @@ install(FILES
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
+# Install the findFFTW.cmake if we had to include it.
+if (DEFINED fftw_cmake_SOURCE_DIR)
+    install(FILES
+        ${fftw_cmake_SOURCE_DIR}/findFFTW.cmake
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
+endif()
+
 enable_testing()
 add_subdirectory(test)
