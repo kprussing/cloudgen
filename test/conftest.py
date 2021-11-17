@@ -32,7 +32,7 @@ def stratocumulus(sample_dir) -> pathlib.Path:
 
 
 @pytest.fixture
-def stratocumulus_expected(stratocumulus) -> pathlib.Path:
+def stratocumulus_expected(stratocumulus) -> Dict[str, str]:
     """Parse the expected stratocumulus cloud values"""
     return parse_input(stratocumulus)
 

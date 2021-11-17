@@ -1,5 +1,9 @@
+from os import PathLike
 from typing import (
-    Dict
+    Union,
 )
-RCData = Dict[str, str]
-def parse_input_file(file: str) -> RCData: ...
+
+from ._types import RCData
+
+
+def parse_input_file(file: Union[PathLike, str]) -> RCData: ...
