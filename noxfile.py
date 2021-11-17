@@ -35,7 +35,11 @@ nox.options.reuse_existing_virtualenvs = True
 @nox.session
 def lint(session):
     """Run the linters"""
-    session.install("flake8", "mypy", "cpplint", "nox>=2020.1.8")
+    deps = config["options"].get("install_requires", [])
+    for _ in config["options"].get("extras_require", {}).values():
+        deps.extend(_)
+
+    session.install("flake8", "mypy", "cpplint", *deps)
     session.run("flake8", "python", "test", "noxfile.py")
     session.run("mypy", "python", "test", "noxfile.py")
     sources = pathlib.Path(__file__).parent.glob("*.[hc]")
