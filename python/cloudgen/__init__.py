@@ -48,8 +48,8 @@ class Cloudgen:
     @input.setter
     def input(self, path: Union[os.PathLike, str]) -> None:
         self._input = path
-        if self._input:
-            self.rc_data.update(parse_input_file(path))
+        if self._input and os.path.exists(self._input):
+            self.rc_data.update(parse_input_file(self._input))
 
     @property
     def verbose(self) -> bool:
