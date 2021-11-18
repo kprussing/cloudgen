@@ -7,6 +7,9 @@ The format is based on `Keep a Changelog`_.
 Unreleased_
 -----------
 
+1.5_ 2021-11-18
+---------------
+
 Added
 ^^^^^
 
@@ -61,7 +64,8 @@ Changed
 
 -   Create a github repository for the source
 
-.. _Unreleased: https://github.com/kprussing/cloudgen/compare/1.4...HEAD
+.. _Unreleased: https://github.com/kprussing/cloudgen/compare/1.5...HEAD
+.. _1.5: https://github.com/kprussing/cloudgen/compare/1.4...1.5
 .. _1.4: https://github.com/kprussing/cloudgen/compare/1.3...1.4
 .. _1.3: https://github.com/kprussing/cloudgen/releases/tag/1.3
 .. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
