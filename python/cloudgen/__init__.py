@@ -32,8 +32,22 @@ class Cloudgen:
     """
     def __init__(self, path: Union[os.PathLike, str] = ""):
         self.rc_data: RCData = {}
-        if path:
-            self.rc_data = parse_input_file(path)
+        self.input = path
+
+    @property
+    def input(self) -> Union[os.PathLike, str]:
+        """The path to the original input file.
+
+        .. @note:: Setting the input path updates the :attr:`rc_data`.
+
+        """
+        return self._input
+
+    @input.setter
+    def input(self, path: Union[os.PathLike, str]) -> None:
+        self._input = path
+        if self._input:
+            self.rc_data.update(parse_input_file(path))
 
     @property
     def verbose(self) -> bool:
