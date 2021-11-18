@@ -5,6 +5,8 @@
 
 import os
 
+import numpy
+
 from typing import (
     List,
     Optional,
@@ -460,6 +462,40 @@ class Cloudgen:
             )
         else:
             self.rc_data[param] = _value
+
+    @property
+    def updated(self) -> bool:
+        """Have any updates been made to the inputs"""
+        if not self.input:
+            return True
+
+        rc_data = parse_input_file(self.input)
+        for param, value in self.rc_data.items():
+            if param not in rc_data:
+                return True
+
+            mine = rc_value(value)
+            orig = rc_value(rc_data[param])
+            # Deal with the string types to avoid confusion.
+            if isinstance(mine, str):
+                if (isinstance(orig, str) and mine != orig) or \
+                        not isinstance(orig, str):
+                    return True
+                else:
+                    continue
+
+            elif isinstance(orig, str):
+                return True
+
+            mine_ = numpy.array(mine)
+            orig_ = numpy.array(orig)
+            if mine_.size != orig_.size:
+                return True
+
+            if not numpy.isclose(mine_, orig_).all():
+                return True
+
+        return False
 
     def __str__(self) -> str:
         """The text of the input file"""

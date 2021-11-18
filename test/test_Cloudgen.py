@@ -1,5 +1,6 @@
 import pathlib
 
+import numpy
 import pytest
 
 from cloudgen import Cloudgen, RCData
@@ -46,6 +47,21 @@ def test_init(cirrus: pathlib.Path,
     with pytest.raises(ValueError):
         # Ignore with mypy to make sure the runtime behavior is right.
         ss.x_domain_size = [1.0, 2.0]  # type: ignore
+
+
+def test_updated(cirrus: pathlib.Path) -> None:
+    """Check updating a parameter triggers the updated flag"""
+    cloud = Cloudgen(cirrus)
+    assert not cloud.updated
+    cloud.verbose = not cloud.verbose
+    assert cloud.updated
+    cloud.verbose = not cloud.verbose
+    cloud.v_wind = numpy.arange(5)
+    assert cloud.updated
+
+    # Check resetting puts everything back to normal
+    cloud.input = cirrus
+    assert not cloud.updated
 
 
 def test_str(cirrus: pathlib.Path, cirrus_expected: RCData) -> None:
