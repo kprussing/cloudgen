@@ -1,10 +1,14 @@
 import pathlib
 
+import numpy
+
 from typing import (
     Dict,
+    List,
+    Union,
 )
 
-from cloudgen import parse_input_file
+from cloudgen import parse_input_file, rc_value
 
 
 def test_parse_cirrus(cirrus: pathlib.Path,
@@ -51,3 +55,49 @@ def test_reparse(cirrus: pathlib.Path,
         assert value.strip() == rc2[param].strip()
 
     assert all(_ in stratocumulus_expected for _ in rc2)
+
+
+def test_conversions(cirrus: pathlib.Path) -> None:
+    """Check the value conversions work as described"""
+    rc_data = parse_input_file(cirrus)
+    result: Union[bool, int, float, str, List[float]]
+
+    param = "verbose"
+    assert param in rc_data
+    result = rc_value(rc_data[param])
+    assert isinstance(result, bool)
+    assert result
+
+    result = rc_value("0")
+    assert isinstance(result, bool)
+    assert not result
+
+    param = "x_pixels"
+    assert param in rc_data
+    result = rc_value(rc_data[param])
+    assert isinstance(result, int)
+    assert result == 256
+
+    result = rc_value("  256 ")
+    assert isinstance(result, int)
+    assert result == 256
+
+    param = "missing_value"
+    assert param in rc_data
+    result = rc_value(rc_data[param])
+    assert isinstance(result, float)
+    assert numpy.isclose(result, -999.0)
+
+    expected: Union[str, List[float]] = "This is a test"
+    assert isinstance(expected, str)
+    result = rc_value(expected)
+    assert isinstance(result, str)
+    assert result == expected
+
+    expected = [10, 15, 20, 25, 30, 35, 40, 40]
+    param = "v_wind"
+    assert param in rc_data
+    result = rc_value(rc_data[param])
+    assert isinstance(result, list)
+    assert len(result) == len(expected)
+    assert numpy.isclose(expected, result).all()

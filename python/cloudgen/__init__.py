@@ -6,6 +6,7 @@
 import os
 
 from typing import (
+    List,
     Optional,
     Sequence,
     Union,
@@ -449,3 +450,58 @@ class Cloudgen:
     def __str__(self) -> str:
         """The text of the input file"""
         return "\n".join([" ".join(_) for _ in self.rc_data.items()])
+
+
+def rc_value(value: str) -> Union[bool, int, float, str, List[float]]:
+    """"Convert configuration variable to its native type.
+
+    Parameters
+    ----------
+
+    value: str
+        The configuration value.
+
+    Returns
+    -------
+
+    bool, int, float, str, or list of float:
+        The value converted to a native type.
+
+    Notes
+    -----
+
+    This will return a bool only if the string is empty (or exclusively
+    white space), '0', 'true', or 'false' (case insensitive).  Further,
+    it will try to convert to the strictest type possible meaning a
+    value of '99' will be converted to an int and not a float.
+
+    """
+    if value.strip() == "0":
+        # Short circuit the explicit '0' to False per the documentation.
+        return False
+
+    try:
+        # Try scalars from the most restrictive to more permissive
+        return int(value)
+    except ValueError:
+        pass
+
+    try:
+        return float(value)
+    except ValueError:
+        pass
+
+    if len(value.split()) > 1:
+        try:
+            # See if we have an array of reals
+            return [float(_) for _ in value.split()]
+        except ValueError:
+            pass
+
+    # We have a string so check for a boolean value.
+    if value.strip() == "":
+        return True
+    elif value.strip().lower() in ("true", "false"):
+        return value.strip().lower() == "true"
+    else:
+        return value
