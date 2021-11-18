@@ -1,5 +1,7 @@
 import pathlib
 
+import pytest
+
 from cloudgen import Cloudgen, RCData
 
 
@@ -41,6 +43,10 @@ def test_init(cirrus: pathlib.Path,
     assert ss is not cc
     assert ss.rc_data is not cc.rc_data
 
+    with pytest.raises(ValueError):
+        # Ignore with mypy to make sure the runtime behavior is right.
+        ss.x_domain_size = [1.0, 2.0]  # type: ignore
+
 
 def test_str(cirrus: pathlib.Path, cirrus_expected: RCData) -> None:
     """Check converting to string preserves structure"""
@@ -49,4 +55,3 @@ def test_str(cirrus: pathlib.Path, cirrus_expected: RCData) -> None:
         param, value = line.split(" ", 1)
         assert param in cirrus_expected
         assert value.strip() == cirrus_expected[param].strip()
-

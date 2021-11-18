@@ -404,9 +404,9 @@ class Cloudgen:
         """Set an integer parameter"""
         try:
             _ = int(value)
-        except ValueError:
+        except (ValueError, TypeError):
             raise ValueError(
-                f"Could not convert {type(value)} to rc_data int"
+                f"Could not convert {value} ({type(value)}) to rc_data int"
             )
 
         self.rc_data[param] = str(value)
@@ -422,9 +422,9 @@ class Cloudgen:
         """Set a real parameter"""
         try:
             _ = float(value)
-        except ValueError:
+        except (ValueError, TypeError):
             raise ValueError(
-                f"Could not convert {type(value)} to rc_data real"
+                f"Could not convert {value} ({type(value)}) to rc_data real"
             )
 
         self.rc_data[param] = str(value)
