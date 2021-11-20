@@ -64,6 +64,20 @@ def test_updated(cirrus: pathlib.Path) -> None:
     assert not cloud.updated
 
 
+def test_run(cirrus: pathlib.Path, tmp_path: pathlib.Path) -> None:
+    """Check that running :program:`cloudgen` works"""
+    cloud = Cloudgen(cirrus)
+    cloud.run(cwd=tmp_path, check=True)
+    assert tmp_path.joinpath(cirrus).exists()
+    new = Cloudgen(tmp_path.joinpath(cirrus))
+    for param, value in cloud.rc_data.items():
+        assert param in new.rc_data
+        assert value.strip() == new.rc_data[param].strip()
+
+    assert all(_ in cloud.rc_data for _ in new.rc_data)
+    assert tmp_path.joinpath(cloud.output_filename).exists()
+
+
 def test_str(cirrus: pathlib.Path, cirrus_expected: RCData) -> None:
     """Check converting to string preserves structure"""
     cloud = Cloudgen(cirrus)

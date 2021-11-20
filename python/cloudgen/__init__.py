@@ -4,6 +4,8 @@
 """
 
 import os
+import shutil
+import subprocess
 
 import numpy
 
@@ -496,6 +498,44 @@ class Cloudgen:
                 return True
 
         return False
+
+    def run(self, **kwargs) -> subprocess.CompletedProcess:
+        """Run :program:`cloudgen` on the configuration
+
+        Parameters
+        ----------
+
+        kwargs: key word arguments
+            The key word arguments to pass to :func:`subprocess.run`.
+
+        Returns
+        -------
+
+        :class:`subprocess.CompletedProcess`:
+            The result :func:`subprocess.run`.
+
+        Raises
+        ------
+
+        The errors raised by :func:`subprocess.run`.
+
+        Notes
+        -----
+
+        This method will generate the configuration file if any changes
+        to the internal configuration is detected.  However, if the
+        ``cwd`` argument is provided and the input file path is
+        relative, the file will be generated relative to ``cwd``.  No
+        transferring of the inputs or outputs is done by this function.
+
+        """
+        path = os.path.join("" if kwargs.get("cwd") is None else kwargs["cwd"],
+                            self.input)
+        if not os.path.exists(path) or self.updated:
+            with open(path, "w") as fid:
+                fid.write(str(self))
+
+        return subprocess.run(["cloudgen", self.input], **kwargs)
 
     def __str__(self) -> str:
         """The text of the input file"""
