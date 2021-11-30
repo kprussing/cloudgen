@@ -1,5 +1,6 @@
 import pathlib
 
+import netCDF4
 import numpy
 import pytest
 
@@ -64,7 +65,9 @@ def test_updated(cirrus: pathlib.Path) -> None:
     assert not cloud.updated
 
 
-def test_run(cirrus: pathlib.Path, tmp_path: pathlib.Path) -> None:
+def test_run(cirrus: pathlib.Path,
+             sample_dir: pathlib.Path,
+             tmp_path: pathlib.Path) -> None:
     """Check that running :program:`cloudgen` works"""
     cloud = Cloudgen(cirrus)
     try:
@@ -79,7 +82,20 @@ def test_run(cirrus: pathlib.Path, tmp_path: pathlib.Path) -> None:
             assert value.strip() == new.rc_data[param].strip()
 
         assert all(_ in cloud.rc_data for _ in new.rc_data)
-        assert tmp_path.joinpath(cloud.output_filename).exists()
+        output = tmp_path.joinpath(cloud.output_filename)
+        assert output.exists()
+        with netCDF4.Dataset(output, "r") as out:
+            assert "variable_name" in cloud.rc_data
+            variable = cloud.rc_data["variable_name"].strip()
+            print(variable, type(variable))
+            assert variable in out.variables
+            reference = sample_dir.joinpath("iwc.nc")
+            assert reference.exists()
+            with netCDF4.Dataset(reference, "r") as ref:
+                assert variable in ref.variables
+                assert numpy.isclose(out[variable],
+                                     ref[variable]).all()
+
     finally:
         if tmp_path.joinpath(cloud.output_filename).exists():
             tmp_path.joinpath(cloud.output_filename).unlink()
