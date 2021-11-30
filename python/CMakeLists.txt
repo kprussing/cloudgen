@@ -37,3 +37,17 @@ target_compile_options(_cloudgen
 )
 install(TARGETS _cloudgen DESTINATION
         ${PYTHON_RELATIVE_SITE_PACKAGES_DIR}/cloudgen)
+
+# Force the RPATH installation so the user does not have to fiddle
+# with the library path `(DY)?LD_LIBRARY_PATH` 1_.  Setting it for the
+# module is relevant primarily for the installation in a virtual
+# environment.
+#
+# .. _1: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
+set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
+if ("${is_system}" STREQUAL "-1")
+    set_target_properties(_cloudgen PROPERTIES
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "${lib_path}")
+endif()
