@@ -1,6 +1,6 @@
 include COPYING MANIFEST.in noxfile.py pyproject.toml
 global-include CMakeLists.txt *.c *.h *.l *.y *.h.in
-recursive-include samples *.dat *.sh README
+recursive-include samples *.dat *.sh README [il]wc.nc
 
 graft cmake
 graft python
