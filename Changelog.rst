@@ -7,6 +7,11 @@ The format is based on `Keep a Changelog`_.
 Unreleased_
 -----------
 
+Added
+^^^^^
+
+-   Install the samples, scripts, and example outputs
+
 1.5_ 2021-11-18
 ---------------
 

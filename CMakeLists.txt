@@ -145,6 +145,8 @@ install(FILES
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
+add_subdirectory(samples)
+
 # Force the RPATH installation so the user does not have to fiddle
 # with the library path `(DY)?LD_LIBRARY_PATH` 1_.
 #
