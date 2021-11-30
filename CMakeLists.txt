@@ -145,5 +145,7 @@ install(FILES
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
+add_subdirectory(samples)
+
 enable_testing()
 add_subdirectory(test)
