@@ -65,18 +65,18 @@ def test_updated(cirrus: pathlib.Path) -> None:
     assert not cloud.updated
 
 
-def test_run(cirrus: pathlib.Path,
-             sample_dir: pathlib.Path,
-             tmp_path: pathlib.Path) -> None:
+def _test_run_helper(cloud_dat: pathlib.Path,
+                     sample_dir: pathlib.Path,
+                     tmp_path: pathlib.Path) -> None:
     """Check that running :program:`cloudgen` works"""
-    cloud = Cloudgen(cirrus)
+    cloud = Cloudgen(cloud_dat)
     try:
         cloud.run(cwd=tmp_path, check=True)
     except Exception:
         raise
     else:
-        assert tmp_path.joinpath(cirrus).exists()
-        new = Cloudgen(tmp_path.joinpath(cirrus))
+        assert tmp_path.joinpath(cloud_dat).exists()
+        new = Cloudgen(tmp_path.joinpath(cloud_dat))
         for param, value in cloud.rc_data.items():
             assert param in new.rc_data
             assert value.strip() == new.rc_data[param].strip()
@@ -89,7 +89,7 @@ def test_run(cirrus: pathlib.Path,
             variable = cloud.rc_data["variable_name"].strip()
             print(variable, type(variable))
             assert variable in out.variables
-            reference = sample_dir.joinpath("iwc.nc")
+            reference = sample_dir.joinpath(new.output_filename)
             assert reference.exists()
             with netCDF4.Dataset(reference, "r") as ref:
                 assert variable in ref.variables
@@ -99,6 +99,20 @@ def test_run(cirrus: pathlib.Path,
     finally:
         if tmp_path.joinpath(cloud.output_filename).exists():
             tmp_path.joinpath(cloud.output_filename).unlink()
+
+
+def test_run_cirrus(cirrus: pathlib.Path,
+                    sample_dir: pathlib.Path,
+                    tmp_path: pathlib.Path) -> None:
+    """Check the cirrus clouds yield the expected results"""
+    _test_run_helper(cirrus, sample_dir, tmp_path)
+
+
+def test_run_stratucumulus(stratocumulus: pathlib.Path,
+                           sample_dir: pathlib.Path,
+                           tmp_path: pathlib.Path) -> None:
+    """Check the stratocumulus clouds yield the expected results"""
+    _test_run_helper(stratocumulus, sample_dir, tmp_path)
 
 
 def test_str(cirrus: pathlib.Path, cirrus_expected: RCData) -> None:
