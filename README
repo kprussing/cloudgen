@@ -11,9 +11,8 @@ This directory contains the "cloudgen" code, for producing stochastic
 It is licensed under the GNU General Public License - see COPYING.
 
 To compile you first need to install version 2 of the FFTW library,
-available from www.fftw.org (note that cloudgen is not compatible with
-version 3 of FFTW) and the netcdf library, available from
-www.unidata.ucar.edu/packages/netcdf.  Cloudgen will be faster but
+available from www.fftw.org and the netcdf library, available from
+https://www.unidata.ucar.edu/software/netcdf/.  Cloudgen will be faster but
 sill sufficiently accurate if you use FFTW compiled with single rather
 than double precision.
 
