@@ -4,6 +4,7 @@ recursive-include samples *.dat *.sh README [il]wc.nc
 
 graft cmake
 graft python
+graft test
 
 prune bld
 prune .nox
