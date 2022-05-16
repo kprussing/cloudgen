@@ -11,6 +11,15 @@ Added
 ^^^^^
 
 -   Install the samples, scripts, and example outputs
+-   Python bindings to input and output files
+
+Changed
+^^^^^^^
+
+Fixed
+^^^^^
+
+-   Installed with ``RPATH`` set properly
 
 1.5_ 2021-11-18
 ---------------
