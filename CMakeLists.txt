@@ -165,3 +165,5 @@ add_subdirectory(test)
 if (SKBUILD)
     add_subdirectory(python)
 endif()
+
+include(CPack)

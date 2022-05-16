@@ -12,6 +12,7 @@ Added
 
 -   Install the samples, scripts, and example outputs
 -   Python bindings to input and output files
+-   CPack packaging
 
 Changed
 ^^^^^^^
