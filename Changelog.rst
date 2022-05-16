@@ -21,6 +21,11 @@ Fixed
 
 -   Installed with ``RPATH`` set properly
 
+Removed
+-------
+
+-   Unused internal functions
+
 1.5_ 2021-11-18
 ---------------
 

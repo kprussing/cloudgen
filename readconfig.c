@@ -11,33 +11,6 @@ extern FILE * yyerr;
 extern int yyparse();
 extern rc_data * parsed_data;
 
-/* Move file pointer to the start of the next line, returning '\n' on
-   success or EOF if the file ended first. */
-static
-int
-__rc_skip_line(FILE *file)
-{
-  char c;
-  do {
-    c = fgetc(file);
-  } while (c != '\n' && c != EOF);
-  return c;
-}
-
-/* Move the file pointer over whitespace, returning the first
-   non-whitespace character found, or '\n' if the line ended first, or
-   EOF if the file ended first. */
-static
-int
-__rc_skip_whitespace(FILE *file)
-{
-  int c;
-  do {
-    c = fgetc(file);
-  } while (c <= ' ' && c != '\n' && c != EOF);
-  return c;
-}
-
 /* Find param in data, returning an element of the rc_data list, or
    NULL if not present. Note that the search is case insensitive. */
 rc_data *
@@ -98,7 +71,6 @@ rc_read(char *file_name, FILE *err_file)
   FILE *file;
   rc_data *data;
   char *memory_error = "Error allocating memory for configuration information\n";
-  int c;
 
   if (!file_name) {
     /* Assign an empty data structure */

@@ -7,7 +7,7 @@
 int line_num = 1;
 %}
 
-%option noyywrap
+%option noyywrap noinput nounput
 
 COMMENT #
 EOL     \n
