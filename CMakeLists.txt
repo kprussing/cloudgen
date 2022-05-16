@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6.1)
 
 cmake_policy(SET CMP0048 NEW)
-project(cloudgen VERSION 1.5 LANGUAGES C)
+project(cloudgen VERSION 1.6 LANGUAGES C)
 
 include(GNUInstallDirs)
 if (NOT DEFINED INSTALL_CONFIGDIR)

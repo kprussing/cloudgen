@@ -10,6 +10,21 @@ Unreleased_
 Added
 ^^^^^
 
+Changed
+^^^^^^^
+
+Fixed
+^^^^^
+
+Removed
+^^^^^^^
+
+1.6_ 2022-05-16
+---------------
+
+Added
+^^^^^
+
 -   Install the samples, scripts, and example outputs
 -   Python bindings to input and output files
 -   CPack packaging
@@ -84,7 +99,8 @@ Changed
 
 -   Create a github repository for the source
 
-.. _Unreleased: https://github.com/kprussing/cloudgen/compare/1.5...HEAD
+.. _Unreleased: https://github.com/kprussing/cloudgen/compare/1.6...HEAD
+.. _1.5: https://github.com/kprussing/cloudgen/compare/1.5...1.6
 .. _1.5: https://github.com/kprussing/cloudgen/compare/1.4...1.5
 .. _1.4: https://github.com/kprussing/cloudgen/compare/1.3...1.4
 .. _1.3: https://github.com/kprussing/cloudgen/releases/tag/1.3
