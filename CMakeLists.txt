@@ -147,5 +147,21 @@ install(FILES
 
 add_subdirectory(samples)
 
+# Force the RPATH installation so the user does not have to fiddle
+# with the library path `(DY)?LD_LIBRARY_PATH` 1_.
+#
+# .. _1: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
+set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
+if ("${is_system}" STREQUAL "-1")
+    set_target_properties(executable PROPERTIES
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "${lib_path}")
+endif()
+
 enable_testing()
 add_subdirectory(test)
+
+if (SKBUILD)
+    add_subdirectory(python)
+endif()

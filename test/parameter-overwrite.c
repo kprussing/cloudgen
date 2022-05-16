@@ -1,9 +1,10 @@
+// Copyright 2022 Keith F. Prussing
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "cloudgen.h"
-#include "readconfig.h"
+#include "cloudgen.h"  // NOLINT(build/include_subdir)
+#include "readconfig.h"  // NOLINT(build/include_subdir)
 
 extern FILE * yyin;
 extern FILE * yyerr;
@@ -42,6 +43,8 @@ int main(int argc, char * argv[]) {
 
   if (argc > 2) {
     if (rc_register_args(parsed_data, argc, argv) == 0) {
+    } else {
+      fprintf(stderr, "rc_register_args returned non zeron\n");
     }
   }
 

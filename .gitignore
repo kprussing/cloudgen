@@ -1,2 +1,6 @@
 bld
 samples/*.nc
+_skbuild/
+.nox
+dist
+MANIFEST
