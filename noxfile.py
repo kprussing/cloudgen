@@ -42,9 +42,7 @@ def lint(session):
     session.install("flake8", "mypy", "cpplint", *deps)
     session.run("flake8", "python", "test", "noxfile.py")
     session.run("mypy", "python", "test", "noxfile.py")
-    sources = pathlib.Path(__file__).parent.glob("*.[hc]")
-    session.run("cpplint", "--recursive", "src", *[str(_) for _ in sources],
-                "test")
+    session.run("cpplint", "--recursive", "python", "test")
 
 
 @nox.session(python=pythons)

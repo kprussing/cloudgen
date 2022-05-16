@@ -1,11 +1,12 @@
+// Copyright 2022 Keith F. Prussing
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "cloudgen.h"
-#include "readconfig.h"
+#include "cloudgen.h"  // NOLINT(build/include_subdir)
+#include "readconfig.h"  // NOLINT(build/include_subdir)
 
 extern FILE * yyin;
 extern FILE * yyerr;
@@ -185,8 +186,7 @@ check_real_array(rc_data * data, char * param, real * value, int len) {
 }
 
 int
-main(int argc, char * argv[])
-{
+main(int argc, char * argv[]) {
   int success;
   real expected[7][8] = {
     /* interp_height */
@@ -234,62 +234,63 @@ main(int argc, char * argv[])
 
   /* Check the boolean variables */
   success = check_bool(parsed_data, "verbose");
-  success = check_bool(parsed_data, "anisotropic_mixing") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_bool(parsed_data, "lognormal_distribution") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
+  success = check_bool(parsed_data, "anisotropic_mixing") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_bool(parsed_data, "lognormal_distribution") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
 
   /* Check the scalar variables */
-  success = check_real(parsed_data, "x_domain_size", 200000.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "z_domain_size", 3500.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_int(parsed_data, "x_pixels", 256) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_int(parsed_data, "z_pixels", 32) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "z_offset", 7000.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_int(parsed_data, "seed", 2) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "vertical_exponent", -2.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "outer_scale", 50000.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "generating_level", 9500.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "threshold", 0.001) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_real(parsed_data, "missing_value", -999.0) == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "x_domain_size", 200000.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "z_domain_size", 3500.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_int(parsed_data, "x_pixels", 256) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_int(parsed_data, "z_pixels", 32) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "z_offset", 7000.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_int(parsed_data, "seed", 2) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "vertical_exponent", -2.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "outer_scale", 50000.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "generating_level", 9500.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "threshold", 0.001) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real(parsed_data, "missing_value", -999.0) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
 
   /* Check some string values */
-  success = check_string(parsed_data, "output_filename", "iwc.nc") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_string(parsed_data, "variable_name", "iwc") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_string(parsed_data, "long_name", "Ice water content") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_string(parsed_data, "units", "g m-3") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
-  success = check_string(parsed_data, "title", "3D stochastic field of ice water content") == EXIT_SUCCESS
-      ? success : EXIT_FAILURE;
+  success = check_string(parsed_data, "output_filename", "iwc.nc") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_string(parsed_data, "variable_name", "iwc") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_string(parsed_data, "long_name", "Ice water content") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_string(parsed_data, "units", "g m-3") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_string(parsed_data, "title",
+          "3D stochastic field of ice water content") ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
 
   /* Now check the arrays of reals */
-  success = check_real_array(parsed_data, "interp_height", expected[0], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
-  success = check_real_array(parsed_data, "v_wind", expected[1], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
-  success = check_real_array(parsed_data, "u_wind", expected[2], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
-  success = check_real_array(parsed_data, "fall_speed", expected[3], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
-  success = check_real_array(parsed_data, "horizontal_exponent", expected[4], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
-  success = check_real_array(parsed_data, "mean", expected[5], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
-  success = check_real_array(parsed_data, "standard_deviation", expected[6], 8) == EXIT_SUCCESS
-     ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "interp_height", expected[0], 8) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "v_wind", expected[1], 8) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "u_wind", expected[2], 8) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "fall_speed", expected[3], 8) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "horizontal_exponent",
+      expected[4], 8) == EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "mean", expected[5], 8) ==
+      EXIT_SUCCESS ? success : EXIT_FAILURE;
+  success = check_real_array(parsed_data, "standard_deviation",
+      expected[6], 8) == EXIT_SUCCESS ? success : EXIT_FAILURE;
 
   return success;
 }

@@ -1,3 +1,4 @@
+// Copyright 2022 Keith F. Prussing
 #include <pybind11/pybind11.h>
 
 #include <cstdio>
@@ -34,7 +35,7 @@ pybind11::dict parse_input_file(pybind11::object path) {
     /* Report errors */
     static int SIZE = 80;
     char buffer[80];
-    long int eof = ftell(err);
+    long int eof = ftell(err);  // NOLINT(runtime/int)
     fseek(err, 0, SEEK_SET);
 
     pybind11::list message;
@@ -73,6 +74,5 @@ PYBIND11_MODULE(_cloudgen, m) {
 
     m.def("parse_input_file",
           &parse_input_file,
-          "Parse the configuration files"
-          );
+          "Parse the configuration files");
 }
