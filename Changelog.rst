@@ -16,6 +16,8 @@ Changed
 Fixed
 ^^^^^
 
+-   Correctly set RPATH for Python installation
+
 Removed
 ^^^^^^^
 

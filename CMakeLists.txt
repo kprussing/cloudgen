@@ -151,7 +151,25 @@ add_subdirectory(samples)
 # with the library path `(DY)?LD_LIBRARY_PATH` 1_.
 #
 # .. _1: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
-set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+if (SKBUILD)
+    # Pull in the scikit-build details if necessary.
+    # Force the Python to search the virtual environment first
+    set(Python3_FIND_VIRTUALENV FIRST)
+    set(Python3_FIND_FRAMEWORK LAST)
+    set(Python3_FIND_REGISTRY LAST)
+
+    if (DEFINED ENV{Python_VER})
+        find_package(Python3 $ENV{Python_VER} EXACT
+                     REQUIRED Interpreter Development)
+    else()
+        find_package(Python3 REQUIRED Interpreter Development)
+    endif()
+    find_package(PythonExtensions REQUIRED)
+
+    set(lib_path "${PYTHON_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+else()
+    set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+endif()
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
 if ("${is_system}" STREQUAL "-1")
     set_target_properties(executable PROPERTIES
