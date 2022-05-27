@@ -43,7 +43,7 @@ if (NOT FFTW_FOUND)
     )
 endif()
 
-find_package(netCDF REQUIRED)
+find_package(netCDF 4.7.3 REQUIRED)
 
 option(USE_FLOAT "Use single precision values" Off)
 if (USE_FLOAT)

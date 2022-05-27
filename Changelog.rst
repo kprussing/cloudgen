@@ -17,6 +17,7 @@ Fixed
 ^^^^^
 
 -   Correctly set RPATH for Python installation
+-   Set the minimum version of netCDF
 
 Removed
 ^^^^^^^
