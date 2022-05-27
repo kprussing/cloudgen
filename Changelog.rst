@@ -18,6 +18,7 @@ Fixed
 
 -   Correctly set RPATH for Python installation
 -   Set the minimum version of netCDF
+-   Use the correct name to install FindFFTW.cmake
 
 Removed
 ^^^^^^^

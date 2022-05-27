@@ -38,7 +38,7 @@ if (NOT FFTW_FOUND)
     endif()
     find_package(FFTW REQUIRED)
     install(FILES
-        ${fftw_cmake_SOURCE_DIR}/findFFTW.cmake
+        ${fftw_cmake_SOURCE_DIR}/FindFFTW.cmake
         DESTINATION ${INSTALL_CONFIGDIR}
     )
 endif()
