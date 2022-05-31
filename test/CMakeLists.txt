@@ -97,3 +97,37 @@ add_test(NAME cirrus_with_effective_radius-initial-phase
     COMMAND initial-phase
             ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
             ${CMAKE_CURRENT_SOURCE_DIR}/cirrus_with_effective_radius-initial-phase.txt)
+
+add_executable(power-law power-law.c check-field.c)
+target_link_libraries(power-law cloudgen::cloudgen)
+add_test(NAME cirrus-power-law
+    COMMAND power-law
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/cirrus-power-law.txt)
+
+add_test(NAME stratocumulus-power-law
+    COMMAND power-law
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/stratocumulus.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/stratocumulus-power-law.txt)
+
+add_test(NAME cirrus_with_effective_radius-power-law
+    COMMAND power-law
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/cirrus_with_effective_radius-power-law.txt)
+
+add_executable(generate-fractal generate-fractal.c check-field.c)
+target_link_libraries(generate-fractal cloudgen::cloudgen)
+add_test(NAME cirrus-generate-fractal
+    COMMAND generate-fractal
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/cirrus-generate-fractal.txt)
+
+add_test(NAME stratocumulus-generate-fractal
+    COMMAND generate-fractal
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/stratocumulus.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/stratocumulus-generate-fractal.txt)
+
+add_test(NAME cirrus_with_effective_radius-generate-fractal
+    COMMAND generate-fractal
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/cirrus_with_effective_radius-generate-fractal.txt)
