@@ -17,11 +17,22 @@ add_test(NAME cirrus
          COMMAND cloudgen::executable
                  ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus.dat
          )
+add_test(NAME cirrus_with_effective_radius
+         COMMAND cloudgen::executable output_filename=iwc_with_effective_radius.nc
+                 ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
+         )
 add_test(NAME stratocumulus
          COMMAND cloudgen::executable
                  ${CMAKE_CURRENT_SOURCE_DIR}/../samples/stratocumulus.dat
          )
 
+add_test(NAME cirrus_with_effective_radius-regression
+         COMMAND nccmp -mdf
+                ${CMAKE_CURRENT_SOURCE_DIR}/../samples/iwc_with_effective_radius.nc
+                ${CMAKE_CURRENT_BINARY_DIR}/iwc_with_effective_radius.nc
+         )
+set_tests_properties(cirrus_with_effective_radius-regression PROPERTIES
+                     DEPENDS "cirrus_with_effective_radius;nccmp-build")
 add_test(NAME cirrus-regression
          COMMAND nccmp -mdf
                 ${CMAKE_CURRENT_SOURCE_DIR}/../samples/iwc.nc
