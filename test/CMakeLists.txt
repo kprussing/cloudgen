@@ -67,7 +67,7 @@ add_test(NAME parameter-overwrite-file
     COMMAND parameter-overwrite ${CMAKE_CURRENT_BINARY_DIR}/cirrus-overwrite.dat
 )
 
-add_executable(create-field create-field.c)
+add_executable(create-field create-field.c check-field.c)
 target_link_libraries(create-field cloudgen::cloudgen)
 add_test(NAME create-field-cirrus
          COMMAND create-field
