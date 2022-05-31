@@ -379,11 +379,14 @@ cg_random_phase(cg_field *field, int ivar)
   complex *p = field->p[ivar];
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
+  real rr, ii;
 
   p[0] = 0.0 + 0.0 * I;
 
   for (n = 1; n < len; n++) {
-    p[n] = gaussian_deviate() + gaussian_deviate() * I;
+    rr = gaussian_deviate();
+    ii = gaussian_deviate();
+    p[n] = rr + ii * I;
   }
 }
 
@@ -396,13 +399,16 @@ cg_correlated_phase(cg_field *field, int ivar, int iorig, real correlation)
   complex *p_orig = field->p[iorig];
   long int n;
   long int len = (field->nx/2+1) * field->ny * field->nz;
+  real rr, ii;
 
   p[0] = 0.0 + 0.0 * I;
 
   if (correlation <= 0.0) {
     /* Use completely new random numbers */
     for (n = 1; n < len; n++) {
-      p[n] = gaussian_deviate() + gaussian_deviate() * I;
+      rr = gaussian_deviate();
+      ii = gaussian_deviate();
+      p[n] = rr + ii * I;
     }
   }
   else if (correlation >= 1.0) {
@@ -414,8 +420,10 @@ cg_correlated_phase(cg_field *field, int ivar, int iorig, real correlation)
        and those from another variable */
     real comp_correlation = 1.0-correlation;
     for (n = 1; n < len; n++) {
+      rr = gaussian_deviate();
+      ii = gaussian_deviate();
       p[n] = correlation * p_orig[n]
-          + comp_correlation * (gaussian_deviate() + gaussian_deviate() * I);
+          + comp_correlation * (rr + ii * I);
     }
   }
 }
