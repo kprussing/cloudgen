@@ -1,3 +1,40 @@
+find_program(nccmp nccmp)
+if (NOT nccmp)
+    FetchContent_Declare(nccmp_cmake
+        GIT_REPOSITORY https://gitlab.com/remikz/nccmp.git
+        INSTALL_COMMAND ""
+    )
+    FetchContent_GetProperties(nccmp_cmake)
+    if (NOT nccmp_cmake_POPULATED)
+        FetchContent_Populate(nccmp_cmake)
+        list(APPEND CMAKE_MODULE_PATH ${nccmp_cmake_SOURCE_DIR}/cmake/modules)
+        add_subdirectory(${nccmp_cmake_SOURCE_DIR}
+                         ${nccmp_cmake_BINARY_DIR})
+    endif()
+endif()
+
+add_test(NAME cirrus
+         COMMAND cloudgen::executable
+                 ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus.dat
+         )
+add_test(NAME stratocumulus
+         COMMAND cloudgen::executable
+                 ${CMAKE_CURRENT_SOURCE_DIR}/../samples/stratocumulus.dat
+         )
+
+add_test(NAME cirrus-regression
+         COMMAND nccmp -mdf
+                ${CMAKE_CURRENT_SOURCE_DIR}/../samples/iwc.nc
+                ${CMAKE_CURRENT_BINARY_DIR}/iwc.nc
+         )
+set_tests_properties(cirrus-regression PROPERTIES DEPENDS "cirrus;nccmp-build")
+add_test(NAME stratocumulus-regression
+         COMMAND nccmp -mdf
+                ${CMAKE_CURRENT_SOURCE_DIR}/../samples/lwc.nc
+                ${CMAKE_CURRENT_BINARY_DIR}/lwc.nc
+         )
+set_tests_properties(stratocumulus-regression PROPERTIES DEPENDS "stratocumulus;nccmp-build")
+
 add_executable(test-parser parser.c)
 target_link_libraries(test-parser cloudgen::cloudgen)
 add_test(NAME test-parser
