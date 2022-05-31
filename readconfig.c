@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "readconfig.h"
+#include "random.h"
 
 extern FILE * yyin;
 extern FILE * yyerr;
@@ -576,3 +577,43 @@ rc_get_real_array(rc_data *data, char *param, int *length)
   }
 }
 
+/* Generate the base field */
+cg_field *
+rc_generate_base_field(rc_data * config) {
+  /* Determine if we are using an effective size parameter */
+  char is_size = 0;
+  is_size = rc_get_boolean(config, "size_variable_name");
+
+  /* Create the base field */
+  real x_domain_size = 200000;
+  real z_domain_size = 2000;
+  int x_pixels = 128;
+  int z_pixels = 32;
+  real x_offset = 0.0;
+  real y_offset = 0.0;
+  real z_offset = 0.0;
+
+  rc_assign_real(config, "x_domain_size", &x_domain_size);
+  rc_assign_real(config, "z_domain_size", &z_domain_size);
+  rc_assign_int(config, "x_pixels", &x_pixels);
+  rc_assign_int(config, "z_pixels", &z_pixels);
+  rc_assign_real(config, "x_offset", &x_offset);
+  rc_assign_real(config, "y_offset", &y_offset);
+  rc_assign_real(config, "z_offset", &z_offset);
+
+  /* Set the domain parameters - note that ny=nx and dy=dx. */
+  real dx = x_domain_size/x_pixels;
+  real dz = z_domain_size/z_pixels;
+
+  /* Create cloud field structure */
+  char verbose = 0;
+  verbose = rc_get_boolean(config, "verbose");
+  if (verbose != 0) {
+    fprintf(stderr, "Creating new field measureing %dx%dx%dx pixels\n",
+            x_pixels, x_pixels, z_pixels);
+  }
+  cg_field * field = cg_new_multi_field(x_pixels, x_pixels, z_pixels,
+                                        dx, dx, dz, x_offset, y_offset,
+                                        z_offset, is_size + 1);
+  return field;
+}

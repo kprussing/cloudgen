@@ -66,3 +66,17 @@ file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/cirrus-overwrite.dat
 add_test(NAME parameter-overwrite-file
     COMMAND parameter-overwrite ${CMAKE_CURRENT_BINARY_DIR}/cirrus-overwrite.dat
 )
+
+add_executable(create-field create-field.c)
+target_link_libraries(create-field cloudgen::cloudgen)
+add_test(NAME create-field-cirrus
+         COMMAND create-field
+         ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus.dat
+         ${CMAKE_CURRENT_SOURCE_DIR}/cirrus-field.txt
+         )
+
+add_test(NAME create_with_effective_radius-field-cirrus
+         COMMAND create-field
+         ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
+         ${CMAKE_CURRENT_SOURCE_DIR}/cirrus_with_effective_radius-field.txt
+         )

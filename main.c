@@ -126,10 +126,6 @@ int
 main(int argc, char **argv)
 {
   /* Default values */
-  real x_domain_size = 200000;
-  real z_domain_size = 2000;
-  int x_pixels = 128;
-  int z_pixels = 32;
   real vertical_exponent = -2.0;
   char *output_filename = "out.nc";
   char *name = "data";
@@ -156,7 +152,6 @@ main(int argc, char **argv)
   real wind_scale_factor = 1.0;
 
   real outer_scale = 1.0e5;
-  real x_offset = 0.0, y_offset = 0.0, z_offset = 0.0;
   real threshold = 0.0;
   real missing_value = 0.0;
 
@@ -275,17 +270,10 @@ main(int argc, char **argv)
   }
 
   /* Read in scalars */
-  rc_assign_real(config, "x_domain_size", &x_domain_size);
-  rc_assign_real(config, "z_domain_size", &z_domain_size);
-  rc_assign_int(config, "x_pixels", &x_pixels);
-  rc_assign_int(config, "z_pixels", &z_pixels);
   rc_assign_string(config, "output_filename", &output_filename);
   rc_assign_string(config, "variable_name", &name);
   rc_assign_string(config, "long_name", &long_name);
   rc_assign_string(config, "units", &units);
-  rc_assign_real(config, "x_offset", &x_offset);
-  rc_assign_real(config, "y_offset", &y_offset);
-  rc_assign_real(config, "z_offset", &z_offset);
   rc_assign_real(config, "vertical_exponent", &vertical_exponent);
   rc_assign_real(config, "outer_scale", &outer_scale);
   rc_assign_real(config, "generating_level", &generating_level);
@@ -348,15 +336,7 @@ main(int argc, char **argv)
     }
   }
 
-  /* Set the domain parameters - note that ny=nx and dy=dx. */
-  dx = x_domain_size/x_pixels;
-  dz = z_domain_size/z_pixels;
-
-  /* Create cloud field structure */
-  chat("Creating new field measuring %dx%dx%d pixels",
-       x_pixels, x_pixels, z_pixels);
-  field = cg_new_multi_field(x_pixels, x_pixels, z_pixels, dx, dx, dz,
-			     x_offset, y_offset, z_offset, is_size+1);
+  field = rc_generate_base_field(config);
 
   /* Interpolate vectors on to the field->z grid. */
   if (n_interp) {
@@ -482,9 +462,9 @@ main(int argc, char **argv)
   nc_check(nc_create(output_filename, NC_CLOBBER, &ncid));
 
   /* Add dimensions and coordinate variables. */ 
-  add_dimension(ncid, "x", x_pixels, &xdimid, &xid, "Distance east");
-  add_dimension(ncid, "y", x_pixels, &ydimid, &yid, "Distance north");
-  add_dimension(ncid, "z", z_pixels, &zdimid, &zid, "Height");
+  add_dimension(ncid, "x", field->nx, &xdimid, &xid, "Distance east");
+  add_dimension(ncid, "y", field->ny, &ydimid, &yid, "Distance north");
+  add_dimension(ncid, "z", field->nz, &zdimid, &zid, "Height");
   dimids[0] = zdimid; dimids[1] = ydimid; dimids[2] = xdimid;
 
   /* Add scalar variables. */
@@ -631,22 +611,22 @@ main(int argc, char **argv)
   /* Assign the cloud field - note that this has to be done row by row
      because there are two dummy values in each. Should use
      cg_squeeze() first and write out the whole lot in one go... */
-  count[2] = x_pixels;
-  for (k = 0; k < z_pixels; k++) {
+  count[2] = field->nx;
+  for (k = 0; k < field->nz; k++) {
     start[0] = k;
-    for (j = 0; j < x_pixels; j++) {
+    for (j = 0; j < field->nx; j++) {
       start[1] = j;
       nc_check(NC_PUT_VARA_REAL(ncid, fieldid, start, count,
-		 field->field[0]+(x_pixels+2)*(j + x_pixels*k)));
+		 field->field[0]+(field->nx+2)*(j + field->nx*k)));
     }
   }
   if (is_size) {
-    for (k = 0; k < z_pixels; k++) {
+    for (k = 0; k < field->nz; k++) {
       start[0] = k;
-      for (j = 0; j < x_pixels; j++) {
+      for (j = 0; j < field->nx; j++) {
 	start[1] = j;
 	nc_check(NC_PUT_VARA_REAL(ncid, sizeid, start, count,
-		   field->field[1]+(x_pixels+2)*(j + x_pixels*k)));
+		   field->field[1]+(field->nx+2)*(j + field->nx*k)));
       }
     }
   }

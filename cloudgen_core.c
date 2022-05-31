@@ -554,3 +554,51 @@ cg_squeeze(cg_field *field)
     }
   }
 }
+
+void
+cg_dump_field(FILE * handle, cg_field * field) {
+  int size, i, j;
+  fftw_fprint_plan(field->fft_plan, handle);
+  fprintf(handle, "\n");
+  fftw_fprint_plan(field->fft_plan_2d_1, handle);
+  fprintf(handle, "\n");
+  fftw_fprint_plan(field->fft_plan_2d_2, handle);
+  fprintf(handle, "\n%d\n%d\n%d\n%d", field->nx, field->ny, field->nz,
+          field->nvars);
+  size = 2 * (field->nx / 2 + 1) * field->ny * field->nz;
+  for (j = 0; j < field->nvars; j++) {
+    fprintf(handle, "\n%f", field->field[j][0]);
+    for (i = 1; i < size; i++) {
+      fprintf(handle, " %f", field->field[j][i]);
+    }
+  }
+
+  fprintf(handle, "\n%f", field->kx[0]);
+  for (i = 1; i < field->nx; i++) {
+    fprintf(handle, " %f", field->kx[i]);
+  }
+  fprintf(handle, "\n%f", field->ky[0]);
+  for (i = 1; i < field->ny; i++) {
+    fprintf(handle, " %f", field->ky[i]);
+  }
+  fprintf(handle, "\n%f", field->kz[0]);
+  for (i = 1; i < field->nz; i++) {
+    fprintf(handle, " %f", field->kz[i]);
+  }
+
+  fprintf(handle, "\n%f", field->x[0]);
+  for (i = 1; i < field->nx; i++) {
+    fprintf(handle, " %f", field->x[i]);
+  }
+  fprintf(handle, "\n%f", field->y[0]);
+  for (i = 1; i < field->ny; i++) {
+    fprintf(handle, " %f", field->y[i]);
+  }
+  fprintf(handle, "\n%f", field->z[0]);
+  for (i = 1; i < field->nz; i++) {
+    fprintf(handle, " %f", field->z[i]);
+  }
+
+  fprintf(handle, "\n%f\n%f\n%f", field->dx, field->dy, field->dz);
+  fprintf(handle, "\n%f\n%f\n%f\n", field->dkx, field->dky, field->dkz);
+}

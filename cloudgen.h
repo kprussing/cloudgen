@@ -101,6 +101,13 @@ extern "C" {
      still refers to the requested mean of the final field. */
   void cg_lognormal(cg_field *field, int ivar, real std, real mean);
 
+  /* Dump a field to file.  This prints the components of the field in
+     the order (fft_plan, fft_plan_2d_1, fft_plan_2d_2, nx, ny, nz,
+     nvars, field, kx, ky, kz, x, y, x, dx, dy, dz, dkx, dky, and dkz).
+     Arrays are printed on a single line separated by white space.
+     Its primary use is for regression testing and debugging purposes. */
+  void cg_dump_field(FILE * handle, cg_field * field);
+
 
   /* FUNCTIONS IN cloudgen_layers.c */
 

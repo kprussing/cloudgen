@@ -128,6 +128,10 @@ int rc_assign_real_array(rc_data *data, char *param,
 int rc_assign_real_array_default(rc_data *data, char *param,
 	  real **value, int min_length, real default_value);
 
+/* Generate a base field from a configuration data. If an error occurs,
+   the field is freed and NULL is returned. */
+cg_field * rc_generate_base_field(rc_data * data);
+
 #ifdef __cplusplus
 }
 #endif
