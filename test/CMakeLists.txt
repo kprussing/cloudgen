@@ -80,3 +80,20 @@ add_test(NAME create_with_effective_radius-field-cirrus
          ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
          ${CMAKE_CURRENT_SOURCE_DIR}/cirrus_with_effective_radius-field.txt
          )
+
+add_executable(initial-phase initial-phase.c check-field.c)
+target_link_libraries(initial-phase cloudgen::cloudgen)
+add_test(NAME cirrus-initial-phase
+    COMMAND initial-phase
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/cirrus-initial-phase.txt)
+
+add_test(NAME stratocumulus-initial-phase
+    COMMAND initial-phase
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/stratocumulus.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/stratocumulus-initial-phase.txt)
+
+add_test(NAME cirrus_with_effective_radius-initial-phase
+    COMMAND initial-phase
+            ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cirrus_with_effective_radius.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/cirrus_with_effective_radius-initial-phase.txt)
