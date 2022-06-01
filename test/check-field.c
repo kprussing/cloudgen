@@ -50,7 +50,8 @@ check_array(int * line, size_t size, real * expected, FILE * handle,
   (*line)++;
   tok = text;
   tok = strtok(tok, " ");
-  for (size_t count = 1; count <= size; count++) {
+  size_t count;
+  for (count = 1; count <= size; count++) {
     if (tok == NULL) {
       fprintf(stderr, "Invalid elements on line %d: Expected %zu, found %zu\n",
               *line, size, count);
@@ -124,7 +125,8 @@ check_field(cg_field * field, FILE * handle, real rtol, real atol) {
   }
 
   size = 2 * (nx / 2 + 1) * ny * nz;
-  for (int i = 0; i < nvars; i++) {
+  int i;
+  for (i = 0; i < nvars; i++) {
     fprintf(stderr, "Checking field %d\n", i + 1);
     if (check_array(&line, size, field->field[i], handle, rtol, atol)
         != EXIT_SUCCESS) {
