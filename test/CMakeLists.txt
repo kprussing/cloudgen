@@ -1,5 +1,7 @@
 find_program(nccmp nccmp)
 if (NOT nccmp)
+    get_target_property(NETCDF_INC_DIR netCDF::netcdf INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(NETCDF_LIB_PATH netCDF::netcdf LOCATION)
     FetchContent_Declare(nccmp_cmake
         GIT_REPOSITORY https://gitlab.com/remikz/nccmp.git
         INSTALL_COMMAND ""
