@@ -83,7 +83,8 @@ main(int argc, char * argv[]) {
   real vertical_exponent, outer_scale;
   rc_assign_real(config, "vertical_exponent", &vertical_exponent);
   rc_assign_real(config, "outer_scale", &outer_scale);
-  for (int i = 0; i < is_size + 1; i++) {
+  int i;
+  for (i = 0; i < is_size + 1; i++) {
     cg_power_law(field, i, outer_scale, vertical_exponent, 0.0);
   }
 
