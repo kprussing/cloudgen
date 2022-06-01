@@ -20,10 +20,10 @@ if (${fc_LOADED} MATCHES NOTFOUND)
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchContent.cmake)
 endif()
 
-find_package(FFTW QUIET)
+find_package(FFTW 3.3.4 QUIET)
 if (NOT FFTW_FOUND)
     FetchContent_Declare(fftw_cmake
-        GIT_REPOSITORY    "https://github.com/egpbos/findfftw.git"
+        GIT_REPOSITORY    "https://github.com/kprussing/findfftw.git"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND     ""
         INSTALL_COMMAND   ""
@@ -36,7 +36,7 @@ if (NOT FFTW_FOUND)
         FetchContent_Populate(fftw_cmake)
         list(APPEND CMAKE_MODULE_PATH ${fftw_cmake_SOURCE_DIR})
     endif()
-    find_package(FFTW REQUIRED)
+    find_package(FFTW 3.3.4 REQUIRED)
     install(FILES
         ${fftw_cmake_SOURCE_DIR}/findFFTW.cmake
         DESTINATION ${INSTALL_CONFIGDIR}
