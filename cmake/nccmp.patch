@@ -1,0 +1,23 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1417788..a40643c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -102,8 +102,6 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+ ADD_SUBDIRECTORY(man)
+ ADD_SUBDIRECTORY(src)
+ 
+-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/org.nccmp.nccmp.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appdata)
+-
+ ENABLE_TESTING()
+ ADD_SUBDIRECTORY(test)
+ 
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 8f55ede..b6be5db 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -36,5 +36,3 @@ ENDIF()
+ IF(WITH_NETCDF)
+     TARGET_COMPILE_OPTIONS(nccmp PUBLIC -I${WITH_NETCDF}/include -I${WITH_NETCDF}/libsrc4)
+ ENDIF()
+-
+-INSTALL(TARGETS nccmp RUNTIME DESTINATION bin)

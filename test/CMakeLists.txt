@@ -3,8 +3,9 @@ if (NOT nccmp)
     get_target_property(NETCDF_INC_DIR netCDF::netcdf INTERFACE_INCLUDE_DIRECTORIES)
     get_target_property(NETCDF_LIB_PATH netCDF::netcdf LOCATION)
     FetchContent_Declare(nccmp_cmake
-        GIT_REPOSITORY https://gitlab.com/remikz/nccmp.git
-        INSTALL_COMMAND ""
+        GIT_REPOSITORY "https://gitlab.com/remikz/nccmp.git"
+        GIT_TAG 1.9.1.0
+        PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/nccmp.patch
     )
     FetchContent_GetProperties(nccmp_cmake)
     if (NOT nccmp_cmake_POPULATED)
@@ -34,19 +35,19 @@ add_test(NAME cirrus_with_effective_radius-regression
                 ${CMAKE_CURRENT_BINARY_DIR}/iwc_with_effective_radius.nc
          )
 set_tests_properties(cirrus_with_effective_radius-regression PROPERTIES
-                     DEPENDS "cirrus_with_effective_radius;nccmp-build")
+                     DEPENDS "cirrus_with_effective_radius")
 add_test(NAME cirrus-regression
          COMMAND nccmp -mdf
                 ${CMAKE_CURRENT_SOURCE_DIR}/../samples/iwc.nc
                 ${CMAKE_CURRENT_BINARY_DIR}/iwc.nc
          )
-set_tests_properties(cirrus-regression PROPERTIES DEPENDS "cirrus;nccmp-build")
+set_tests_properties(cirrus-regression PROPERTIES DEPENDS "cirrus")
 add_test(NAME stratocumulus-regression
          COMMAND nccmp -mdf
                 ${CMAKE_CURRENT_SOURCE_DIR}/../samples/lwc.nc
                 ${CMAKE_CURRENT_BINARY_DIR}/lwc.nc
          )
-set_tests_properties(stratocumulus-regression PROPERTIES DEPENDS "stratocumulus;nccmp-build")
+set_tests_properties(stratocumulus-regression PROPERTIES DEPENDS "stratocumulus")
 
 add_executable(test-parser parser.c)
 target_link_libraries(test-parser cloudgen::cloudgen)
