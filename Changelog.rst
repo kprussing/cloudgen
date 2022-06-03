@@ -10,6 +10,21 @@ Unreleased_
 Added
 ^^^^^
 
+Changed
+^^^^^^^
+
+Fixed
+^^^^^
+
+Removed
+^^^^^^^
+
+1.7_ 2022-06-03
+---------------
+
+Added
+^^^^^
+
 -   Regression tests
 
 Changed
@@ -109,7 +124,8 @@ Changed
 
 -   Create a github repository for the source
 
-.. _Unreleased: https://github.com/kprussing/cloudgen/compare/1.6...HEAD
+.. _Unreleased: https://github.com/kprussing/cloudgen/compare/1.7...HEAD
+.. _1.6: https://github.com/kprussing/cloudgen/compare/1.6...1.7
 .. _1.5: https://github.com/kprussing/cloudgen/compare/1.5...1.6
 .. _1.5: https://github.com/kprussing/cloudgen/compare/1.4...1.5
 .. _1.4: https://github.com/kprussing/cloudgen/compare/1.3...1.4
