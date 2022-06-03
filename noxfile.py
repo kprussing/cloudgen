@@ -1,6 +1,7 @@
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -107,6 +108,9 @@ def tests(session):
     builddir = proc.stdout.splitlines()[0]
     if proc.stderr != "":
         session.error(proc.stderr)
+
+    if os.path.exists(builddir):
+        shutil.rmtree(builddir)
 
     env = {"Python_VER": session.python,
            "Python3_ROOT_DIR": os.path.dirname(session.bin)}
