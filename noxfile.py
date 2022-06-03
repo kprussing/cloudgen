@@ -59,6 +59,7 @@ def tests(session):
         session.install(*deps)
 
     # Check the version of FFTW if possible
+    installed_fftw = False
     try:
         proc = subprocess.run(["fftw-wisdom-to-conf", "-V"],
                               check=True,
@@ -69,6 +70,7 @@ def tests(session):
     except subprocess.CalledProcessError as err:
         if nox.options.default_venv_backend == "conda":
             session.conda_install("fftw>=3.3.4")
+            installed_fftw = True
         else:
             session.error(err.stderr)
 
@@ -82,6 +84,7 @@ def tests(session):
             if version < (3, 3, 4):
                 if nox.options.default_venv_backend == "conda":
                     session.conda_install("fftw>=3.3.4")
+                    installed_fftw = True
                 else:
                     session.error(f"Insufficient FFTW version {version}")
 
@@ -107,6 +110,9 @@ def tests(session):
 
     env = {"Python_VER": session.python,
            "Python3_ROOT_DIR": os.path.dirname(session.bin)}
+    if installed_fftw:
+        env["FFTWDIR"] = os.path.dirname(session.bin)
+
     session.install(".", "--use-feature=in-tree-build", env=env)
     if session.posargs:
         tests = session.posargs
