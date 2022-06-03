@@ -58,6 +58,33 @@ def tests(session):
     if deps != []:
         session.install(*deps)
 
+    # Check the version of FFTW if possible
+    try:
+        proc = subprocess.run(["fftw-wisdom-to-conf", "-V"],
+                              check=True,
+                              capture_output=True,
+                              text=True,
+                              env=session.env,
+                              )
+    except subprocess.CalledProcessError as err:
+        if nox.options.default_venv_backend == "conda":
+            session.conda_install("fftw>=3.3.4")
+        else:
+            session.error(err.stderr)
+
+    else:
+        match = re.search(r"FFTW\s*version\s*(\d+([.]\d+([.]\d+)?)?)",
+                          proc.stdout)
+        if not match:
+            session.warn("Could not determine FFTW version")
+        else:
+            version = tuple(int(_) for _ in match.group(1).split("."))
+            if version < (3, 3, 4):
+                if nox.options.default_venv_backend == "conda":
+                    session.conda_install("fftw>=3.3.4")
+                else:
+                    session.error(f"Insufficient FFTW version {version}")
+
     # Remove any previous builds to make scikit-build happy.
     try:
         proc = subprocess.run([os.path.join(session.bin, "python"),
