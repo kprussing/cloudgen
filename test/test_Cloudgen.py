@@ -87,7 +87,6 @@ def _test_run_helper(cloud_dat: pathlib.Path,
         with netCDF4.Dataset(output, "r") as out:
             assert "variable_name" in cloud.rc_data
             variable = cloud.rc_data["variable_name"].strip()
-            print(variable, type(variable))
             assert variable in out.variables
             reference = sample_dir.joinpath(new.output_filename)
             assert reference.exists()
