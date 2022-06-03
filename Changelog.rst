@@ -17,6 +17,7 @@ Changed
 
 -   Refactored the base field generation into a subprogram
 -   Forced the order of random number selection
+-   Do not rebuild cloudgen if present when building Python bindings
 
 Fixed
 ^^^^^
