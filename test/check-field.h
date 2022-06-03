@@ -1,9 +1,10 @@
-#ifndef CLOUDGEN_TEST_CHECK_FIELD_
-#define CLOUDGEN_TEST_CHECK_FIELD_
+/* Copyright 2022 Keith F. Prussing */
+#ifndef TEST_CHECK_FIELD_H_
+#define TEST_CHECK_FIELD_H_
 
 #include <stdlib.h>
 
-#include "cloudgen.h"
+#include "cloudgen.h"  /* NOLINT */
 
 /* Check an FFTW plan for consistency. Returns EXIT_SUCCESS if they are
    consistent otherwise EXIT_FAILURE. */
@@ -19,4 +20,4 @@ int check_array(int * line, size_t size, real * expected, FILE * handle,
    appropriate to determine if the fields are consistent. */
 int check_field(cg_field * field, FILE * handle, real rtol, real atol);
 
-#endif //  CLOUDGEN_TEST_CHECK_FIELD_
+#endif  /* TEST_CHECK_FIELD_H_ */

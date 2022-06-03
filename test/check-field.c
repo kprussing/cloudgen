@@ -1,3 +1,5 @@
+/* Copyright 2022 Keith F. Prussing */
+
 /* Helper tools for testing */
 
 #include <math.h>
@@ -5,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "check-field.h"
+#include "check-field.h"  /* NOLINT */
 
 /** @brief Check an FFTW plan
  */
@@ -13,11 +15,11 @@ int
 check_plan(fftw_plan plan, FILE * handle, int * line) {
   int success = EXIT_SUCCESS;
   char * _plan = fftw_sprint_plan(plan);
-  char * left, * right = NULL;
+  char * left, * right = NULL, * last;
   size_t size;
 
   left = _plan;
-  left = strtok(left, "\n");
+  left = strtok_r(left, "\n", &last);
   while (left != NULL) {
     getline(&right, &size, handle);
     (*line)++;
@@ -28,7 +30,7 @@ check_plan(fftw_plan plan, FILE * handle, int * line) {
       success = EXIT_FAILURE;
       break;
     }
-    left = strtok(NULL, "\n");
+    left = strtok_r(NULL, "\n", &last);
   }
   free(_plan);
   if (right != NULL) {
@@ -44,12 +46,12 @@ int
 check_array(int * line, size_t size, real * expected, FILE * handle,
             real rtol, real atol) {
   int success = EXIT_SUCCESS;
-  char * text = NULL, * tok;
+  char * text = NULL, * tok, * last;
   size_t len;
   getline(&text, &len, handle);
   (*line)++;
   tok = text;
-  tok = strtok(tok, " ");
+  tok = strtok_r(tok, " ", &last);
   size_t count;
   for (count = 1; count <= size; count++) {
     if (tok == NULL) {
@@ -59,8 +61,8 @@ check_array(int * line, size_t size, real * expected, FILE * handle,
       break;
     }
     real value = atof(tok);
-    if (fabs(expected[count-1] - value) > (atol + rtol * fabs(expected[count-1]))
-        ) {
+    if (fabs(expected[count-1] - value) >
+            (atol + rtol * fabs(expected[count-1]))) {
       fprintf(stderr,
               "Invalid element %zu on line %d:\n"
               "\tExpected: %f\n"
@@ -69,7 +71,7 @@ check_array(int * line, size_t size, real * expected, FILE * handle,
       success = EXIT_FAILURE;
       break;
     }
-    tok = strtok(NULL, " ");
+    tok = strtok_r(NULL, " ", &last);
   }
   if (text != NULL) {
     free(text);

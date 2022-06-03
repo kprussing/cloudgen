@@ -1,3 +1,4 @@
+/* Copyright 2022 Keith F. Prussing */
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -6,10 +7,10 @@
 #include <unistd.h>
 #include <sys/errno.h>
 
-#include "cloudgen.h"
-#include "readconfig.h"
+#include "cloudgen.h"  /* NOLINT */
+#include "readconfig.h"  /* NOLINT */
 
-#include "check-field.h"
+#include "check-field.h"  /* NOLINT */
 
 void
 usage(FILE * fd) {
