@@ -1,11 +1,12 @@
 find_program(nccmp nccmp)
 if (NOT nccmp)
+    find_program(Patch_EXECUTABLE
+                 NAMES patch)
     get_target_property(NETCDF_INC_DIR netCDF::netcdf INTERFACE_INCLUDE_DIRECTORIES)
     get_target_property(NETCDF_LIB_PATH netCDF::netcdf LOCATION)
     FetchContent_Declare(nccmp_cmake
-        GIT_REPOSITORY "https://gitlab.com/remikz/nccmp.git"
-        GIT_TAG 1.9.1.0
-        PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/nccmp.patch
+        URL https://gitlab.com/remikz/nccmp/-/archive/1.9.1.0/nccmp-1.9.1.0.tar.gz
+        PATCH_COMMAND ${Patch_EXECUTABLE} -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/nccmp.patch
     )
     FetchContent_GetProperties(nccmp_cmake)
     if (NOT nccmp_cmake_POPULATED)
