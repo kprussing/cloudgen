@@ -16,6 +16,8 @@ Changed
 Fixed
 ^^^^^
 
+-   Inclusion of ncmpp for testing purposes
+
 Removed
 ^^^^^^^
 
