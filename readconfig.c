@@ -609,7 +609,7 @@ rc_generate_base_field(rc_data * config) {
   char verbose = 0;
   verbose = rc_get_boolean(config, "verbose");
   if (verbose != 0) {
-    fprintf(stderr, "Creating new field measureing %dx%dx%dx pixels\n",
+    fprintf(stderr, "Creating new field measureing %dx%dx%d pixels\n",
             x_pixels, x_pixels, z_pixels);
   }
   cg_field * field = cg_new_multi_field(x_pixels, x_pixels, z_pixels,
