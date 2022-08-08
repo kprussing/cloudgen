@@ -14,7 +14,143 @@ if (NOT DEFINED INSTALL_CONFIGDIR)
     endif()
 endif()
 
-set(BUILD_cloudgen TRUE)
+# Preemptively load FetchContent for adding external dependencies
+include(FetchContent OPTIONAL RESULT_VARIABLE fc_LOADED)
+if (${fc_LOADED} MATCHES NOTFOUND)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchContent.cmake)
+endif()
+
+find_package(FFTW 3.3.4 QUIET)
+if (NOT FFTW_FOUND)
+    FetchContent_Declare(fftw_cmake
+        GIT_REPOSITORY    "https://github.com/kprussing/findfftw.git"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND     ""
+        INSTALL_COMMAND   ""
+        TEST_COMMAND      ""
+        SOURCE_DIR        "external/findFFTW"
+        INSTALL_DIR       ""
+    )
+    FetchContent_GetProperties(fftw_cmake)
+    if (NOT fftw_cmake_POPULATED)
+        FetchContent_Populate(fftw_cmake)
+        list(APPEND CMAKE_MODULE_PATH ${fftw_cmake_SOURCE_DIR})
+    endif()
+    find_package(FFTW 3.3.4 REQUIRED)
+    install(FILES
+        ${fftw_cmake_SOURCE_DIR}/FindFFTW.cmake
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
+endif()
+
+find_package(netCDF 4.7.3 REQUIRED)
+
+option(USE_FLOAT "Use single precision values" Off)
+if (USE_FLOAT)
+    add_definitions(-DFFTW_ENABLE_FLOAT)
+    set(fftw_lib FFTW::Float)
+else()
+    set(fftw_lib FFTW::Double)
+endif()
+
+find_package(BISON 3.0.1 REQUIRED)
+find_package(FLEX REQUIRED)
+
+flex_target(lexer parser.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.c)
+bison_target(parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c)
+add_flex_bison_dependency(lexer parser)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+add_library(cloudgen SHARED
+    cloudgen_core.c
+    cloudgen_layers.c
+    readconfig.c
+    random.c
+    nctools.c
+    ${FLEX_lexer_OUTPUTS}
+    ${BISON_parser_OUTPUTS}
+)
+target_compile_options(cloudgen
+    PRIVATE
+        $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:
+            -Wall
+            -Wextra
+            -pedantic
+        >
+)
+target_compile_definitions(cloudgen
+    PUBLIC
+        $<$<BOOL:${USE_FLOAT}>:FFTW_ENABLE_FLOAT>
+)
+target_include_directories(cloudgen
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(cloudgen PUBLIC ${fftw_lib} netCDF::netcdf)
+set_target_properties(cloudgen PROPERTIES
+    C_STANDARD 11
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+add_library(cloudgen::cloudgen ALIAS cloudgen)
+
+add_executable(executable main.c)
+target_link_libraries(executable cloudgen)
+set_target_properties(executable PROPERTIES OUTPUT_NAME cloudgen)
+add_executable(cloudgen::executable ALIAS executable)
+
+install(TARGETS cloudgen
+                executable
+    EXPORT cloudgen-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(FILES cloudgen.h
+              readconfig.h
+              random.h
+              ${CMAKE_CURRENT_BINARY_DIR}/config.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cloudgen
+)
+
+install(EXPORT cloudgen-targets
+    FILE
+        cloudgenTargets.cmake
+    NAMESPACE
+        cloudgen::
+    DESTINATION
+        ${INSTALL_CONFIGDIR}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/cloudgenConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+# Install the config, configversion and custom find modules
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+add_subdirectory(samples)
+
+# Force the RPATH installation so the user does not have to fiddle
+# with the library path `(DY)?LD_LIBRARY_PATH` 1_.
+#
+# .. _1: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
 if (SKBUILD)
     # Pull in the scikit-build details if necessary.
     # Force the Python to search the virtual environment first
@@ -31,169 +167,21 @@ if (SKBUILD)
     find_package(PythonExtensions REQUIRED)
 
     set(lib_path "${PYTHON_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-
-    # Determine if we need to build the library and executable
-    find_package(cloudgen QUIET)
-    if (cloudgen_FOUND)
-        set(BUILD_cloudgen FALSE)
-    endif()
 else()
     set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
-
-if (BUILD_cloudgen)
-    # Preemptively load FetchContent for adding external dependencies
-    include(FetchContent OPTIONAL RESULT_VARIABLE fc_LOADED)
-    if (${fc_LOADED} MATCHES NOTFOUND)
-        include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchContent.cmake)
-    endif()
-
-    find_package(FFTW 3.3.4 QUIET)
-    if (NOT FFTW_FOUND)
-        FetchContent_Declare(fftw_cmake
-            GIT_REPOSITORY    "https://github.com/kprussing/findfftw.git"
-            CONFIGURE_COMMAND ""
-            BUILD_COMMAND     ""
-            INSTALL_COMMAND   ""
-            TEST_COMMAND      ""
-            SOURCE_DIR        "external/findFFTW"
-            INSTALL_DIR       ""
-        )
-        FetchContent_GetProperties(fftw_cmake)
-        if (NOT fftw_cmake_POPULATED)
-            FetchContent_Populate(fftw_cmake)
-            list(APPEND CMAKE_MODULE_PATH ${fftw_cmake_SOURCE_DIR})
-        endif()
-        find_package(FFTW 3.3.4 REQUIRED)
-        install(FILES
-            ${fftw_cmake_SOURCE_DIR}/FindFFTW.cmake
-            DESTINATION ${INSTALL_CONFIGDIR}
-        )
-    endif()
-
-    find_package(netCDF 4.7.3 REQUIRED)
-
-    option(USE_FLOAT "Use single precision values" Off)
-    if (USE_FLOAT)
-        add_definitions(-DFFTW_ENABLE_FLOAT)
-        set(fftw_lib FFTW::Float)
-    else()
-        set(fftw_lib FFTW::Double)
-    endif()
-
-    find_package(BISON 3.0.1 REQUIRED)
-    find_package(FLEX REQUIRED)
-
-    flex_target(lexer parser.l ${CMAKE_CURRENT_BINARY_DIR}/lexer.c)
-    bison_target(parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c)
-    add_flex_bison_dependency(lexer parser)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-                   ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-    add_library(cloudgen SHARED
-        cloudgen_core.c
-        cloudgen_layers.c
-        readconfig.c
-        random.c
-        nctools.c
-        ${FLEX_lexer_OUTPUTS}
-        ${BISON_parser_OUTPUTS}
-    )
-    target_compile_options(cloudgen
-        PRIVATE
-            $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:Clang>,$<C_COMPILER_ID:AppleClang>>:
-                -Wall
-                -Wextra
-                -pedantic
-            >
-    )
-    target_compile_definitions(cloudgen
-        PUBLIC
-            $<$<BOOL:${USE_FLOAT}>:FFTW_ENABLE_FLOAT>
-    )
-    target_include_directories(cloudgen
-        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
-    target_link_libraries(cloudgen PUBLIC ${fftw_lib} netCDF::netcdf)
-    set_target_properties(cloudgen PROPERTIES
-        C_STANDARD 11
-        VERSION ${PROJECT_VERSION}
-        SOVERSION ${PROJECT_VERSION_MAJOR}
-    )
-    add_library(cloudgen::cloudgen ALIAS cloudgen)
-
-    add_executable(executable main.c)
-    target_link_libraries(executable cloudgen)
-    set_target_properties(executable PROPERTIES OUTPUT_NAME cloudgen)
-    add_executable(cloudgen::executable ALIAS executable)
-
-    install(TARGETS cloudgen
-                    executable
-        EXPORT cloudgen-targets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
-
-    install(FILES cloudgen.h
-                  readconfig.h
-                  random.h
-                  ${CMAKE_CURRENT_BINARY_DIR}/config.h
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cloudgen
-    )
-
-    install(EXPORT cloudgen-targets
-        FILE
-            cloudgenTargets.cmake
-        NAMESPACE
-            cloudgen::
-        DESTINATION
-            ${INSTALL_CONFIGDIR}
-    )
-
-    include(CMakePackageConfigHelpers)
-    write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion
-    )
-
-    configure_package_config_file(
-        ${CMAKE_CURRENT_LIST_DIR}/cmake/cloudgenConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
-        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-    )
-
-    # Install the config, configversion and custom find modules
-    install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/cloudgenConfigVersion.cmake
-        DESTINATION ${INSTALL_CONFIGDIR}
-    )
-
-    add_subdirectory(samples)
-
-    # Force the RPATH installation so the user does not have to fiddle
-    # with the library path `(DY)?LD_LIBRARY_PATH` 1_.
-    #
-    # .. _1: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
-    list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
-    if ("${is_system}" STREQUAL "-1")
-        set_target_properties(executable PROPERTIES
-            INSTALL_RPATH_USE_LINK_PATH TRUE
-            INSTALL_RPATH "${lib_path}")
-    endif()
-
-    enable_testing()
-    add_subdirectory(test)
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
+if ("${is_system}" STREQUAL "-1")
+    set_target_properties(executable PROPERTIES
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "${lib_path}")
 endif()
+
+enable_testing()
+add_subdirectory(test)
 
 if (SKBUILD)
     add_subdirectory(python)
 endif()
 
-if (BUILD_cloudgen)
-    include(CPack)
-endif()
+include(CPack)

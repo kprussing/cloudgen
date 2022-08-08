@@ -32,6 +32,11 @@ install(TARGETS _cloudgen DESTINATION
 # environment.
 #
 # .. _1: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
+if (SKBUILD)
+    set(lib_path "${PYTHON_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+else()
+    set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+endif()
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
 if ("${is_system}" STREQUAL "-1")
     set_target_properties(_cloudgen PROPERTIES
