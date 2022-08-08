@@ -18,6 +18,7 @@
 #define NC_PUT_ATT_REAL nc_put_att_float
 #define NC_PUT_VAR_REAL nc_put_var_float
 #define NC_PUT_VARA_REAL nc_put_vara_float
+#define NC_REAL NC_FLOAT
 
 #define fftw_plan fftwf_plan
 #define fftw_malloc fftwf_malloc
@@ -35,6 +36,7 @@
 #define NC_PUT_ATT_REAL nc_put_att_double
 #define NC_PUT_VAR_REAL nc_put_var_double
 #define NC_PUT_VARA_REAL nc_put_vara_double
+#define NC_REAL NC_DOUBLE
 
 #endif
 

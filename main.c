@@ -48,7 +48,7 @@ add_dimension(int ncid, char *name, int n, int *dimid,
 {
   char axis[2] = {'X', '\0'};
   nc_check(nc_def_dim(ncid, name, n, dimid));
-  nc_check(nc_def_var(ncid, name, NC_FLOAT, 1, dimid, varid));
+  nc_check(nc_def_var(ncid, name, NC_REAL, 1, dimid, varid));
   nc_check(nc_put_att_text(ncid, *varid, "long_name",
 			   strlen(long_name), long_name));
   nc_check(nc_put_att_text(ncid, *varid, "units", 1, "m"));
@@ -62,7 +62,7 @@ void
 add_vector(int ncid, char *name, int dimid,
 	   int *varid, char *units, char *long_name)
 {
-  nc_check(nc_def_var(ncid, name, NC_FLOAT, 1, &dimid, varid));
+  nc_check(nc_def_var(ncid, name, NC_REAL, 1, &dimid, varid));
   if (long_name) {
     nc_check(nc_put_att_text(ncid, *varid, "long_name",
 			     strlen(long_name),long_name));
@@ -78,7 +78,7 @@ static
 void
 add_scalar(int ncid, char *name, int *varid, char *units, char *long_name)
 {
-  nc_check(nc_def_var(ncid, name, NC_FLOAT, 0, NULL, varid));
+  nc_check(nc_def_var(ncid, name, NC_REAL, 0, NULL, varid));
   if (long_name) {
     nc_check(nc_put_att_text(ncid, *varid, "long_name",
 			     strlen(long_name),long_name));
@@ -518,27 +518,27 @@ main(int argc, char **argv)
   }
 
   /* Add the three-dimensional cloud field variable itself. */
-  nc_check(nc_def_var(ncid, name, NC_FLOAT, 3, dimids, &fieldid));
+  nc_check(nc_def_var(ncid, name, NC_REAL, 3, dimids, &fieldid));
   nc_check(nc_put_att_text(ncid, fieldid, "long_name",
 			   strlen(long_name), long_name));
   nc_check(nc_put_att_text(ncid, fieldid, "units", strlen(units), units));
   if (is_threshold) {
     nc_check(NC_PUT_ATT_REAL(ncid, fieldid, "missing_value",
-			      NC_FLOAT, 1, &missing_value));
+			      NC_REAL, 1, &missing_value));
     nc_check(NC_PUT_ATT_REAL(ncid, fieldid, "_FillValue",
-			      NC_FLOAT, 1, &missing_value));
+			      NC_REAL, 1, &missing_value));
   }
 
   if (is_size) {
-    nc_check(nc_def_var(ncid, size_name, NC_FLOAT, 3, dimids, &sizeid));
+    nc_check(nc_def_var(ncid, size_name, NC_REAL, 3, dimids, &sizeid));
     nc_check(nc_put_att_text(ncid, sizeid, "long_name",
 			   strlen(size_long_name), size_long_name));
     nc_check(nc_put_att_text(ncid, sizeid, "units", strlen(size_units), size_units));
     if (is_threshold) {
       nc_check(NC_PUT_ATT_REAL(ncid, sizeid, "missing_value",
-				NC_FLOAT, 1, &missing_value));
+				NC_REAL, 1, &missing_value));
       nc_check(NC_PUT_ATT_REAL(ncid, sizeid, "_FillValue",
-				NC_FLOAT, 1, &missing_value));
+				NC_REAL, 1, &missing_value));
     }
   }
 
