@@ -21,6 +21,8 @@ Fixed
 Removed
 ^^^^^^^
 
+-   Conditional build of library and executable with Python bindings
+
 1.7_ 2022-06-03
 ---------------
 
