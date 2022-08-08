@@ -13,6 +13,8 @@ Added
 Changed
 ^^^^^^^
 
+-   Lower limit on netCDF4
+
 Fixed
 ^^^^^
 

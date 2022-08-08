@@ -43,7 +43,12 @@ if (NOT FFTW_FOUND)
     )
 endif()
 
-find_package(netCDF 4.7.3 REQUIRED)
+find_package(netCDF 4.7.0 REQUIRED)
+if (NOT TARGET netCDF::netcdf)
+    add_library(netCDF::netcdf INTERFACE)
+    target_link_libraries(netCDF::netcdf INTERFACE netcdf)
+    target_include_directories(netCDF::netcdf INTERFACE ${netcdf_INCLUDE_DRS})
+endif()
 
 option(USE_FLOAT "Use single precision values" Off)
 if (USE_FLOAT)
