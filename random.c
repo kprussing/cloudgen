@@ -35,7 +35,7 @@ seed_random_number_generator(long seed)
 
 static
 float
-nr_uniform_deviate()
+nr_uniform_deviate(void)
 {
   int j;
   if (iff == 0) {
@@ -53,7 +53,7 @@ nr_uniform_deviate()
 }
 
 /* By default we use the nr_uniform_deviate function */
-float (*uniform_deviate) () = *nr_uniform_deviate;
+float (*uniform_deviate) (void) = *nr_uniform_deviate;
 
 /* Recent versions of linux provide two devices, /dev/random and
    /dev/urandom. The first provides a source of high quality random
@@ -64,7 +64,7 @@ float (*uniform_deviate) () = *nr_uniform_deviate;
 
 static
 float
-kernel_uniform_deviate()
+kernel_uniform_deviate(void)
 {
   unsigned short value;
   fread(&value, 2, 1, dev_random);
@@ -72,7 +72,7 @@ kernel_uniform_deviate()
 }
 
 int
-kernel_int_seed()
+kernel_int_seed(void)
 {
   int value;
   if (dev_random) {
@@ -95,7 +95,7 @@ open_kernel_random_file(char *file_name)
 }
 
 void
-close_kernel_random_file()
+close_kernel_random_file(void)
 {
   if (dev_random) {
     fclose(dev_random);
@@ -106,7 +106,7 @@ close_kernel_random_file()
 /* Calculate Gaussian deviates from uniform deviates - this is the
    "gasdev" function from Numerical Recipies */
 float
-gaussian_deviate()
+gaussian_deviate(void)
 {
   static int iset = 0;
   static float gset;
@@ -133,7 +133,7 @@ gaussian_deviate()
 
 /* A function for generating 32 random bits */
 unsigned int
-bitfield32_deviate()
+bitfield32_deviate(void)
 {
   static long ix1 = 1;
   static long ix2 = 1;

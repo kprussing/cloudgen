@@ -9,7 +9,7 @@
 
 extern FILE * yyin;
 extern FILE * yyerr;
-extern int yyparse();
+extern int yyparse(void);
 extern rc_data * parsed_data;
 
 /* Find param in data, returning an element of the rc_data list, or

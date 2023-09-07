@@ -8,14 +8,14 @@ void seed_random_number_generator(long seed);
 /* Return a random float between 0.0 and 1.0. 714025 possible values
    can be returned. The function prototype should be treated as "float
    uniform_deviate()" */
-extern float (*uniform_deviate) ();
+extern float (*uniform_deviate) (void);
 
 /* Return a float drawn from a Gaussian probability distribution with
    a mean of 0 and a standard deviation of 1. */
-float gaussian_deviate();
+float gaussian_deviate(void);
 
 /* Return 32 pseudo-random bits */
-unsigned int bitfield32_deviate();
+unsigned int bitfield32_deviate(void);
 
 /* Use file_name (usually "/dev/random" or "/dev/urandom" on linux) as
    a source of high-quality random bits in subsequent calls to
@@ -28,11 +28,11 @@ FILE *open_kernel_random_file(char *file_name);
 
 /* Seed the pseudo-random number generator using the kernel random
    file, and return the seed. */
-int kernel_int_seed();
+int kernel_int_seed(void);
 
 /* Close the kernel file and use the pseudo-random number generator
    for all subsequent random number calls. */
-void close_kernel_random_file();
+void close_kernel_random_file(void);
 
 /* Fowler/Noll/Vo hash functions */
 #define FNV_32_PRIME 16777619
