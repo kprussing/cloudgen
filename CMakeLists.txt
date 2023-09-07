@@ -96,6 +96,13 @@ set_target_properties(cloudgen PROPERTIES
 )
 add_library(cloudgen::cloudgen ALIAS cloudgen)
 
+if (CMAKE_C_COMPILER_ID MATCHES "(GNU|(Apple)?Clang)")
+    # I'm sure there is a cleaner way to silence this warning.
+    set_source_files_properties(${FLEX_lexer_OUTPUTS} PROPERTIES
+        COMPILE_OPTIONS -Wno-sign-compare
+    )
+endif()
+
 add_executable(executable main.c)
 target_link_libraries(executable cloudgen)
 set_target_properties(executable PROPERTIES OUTPUT_NAME cloudgen)
