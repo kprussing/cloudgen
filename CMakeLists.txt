@@ -187,8 +187,12 @@ if ("${is_system}" STREQUAL "-1")
         INSTALL_RPATH "${lib_path}")
 endif()
 
-enable_testing()
-add_subdirectory(test)
+option(ENABLE_TESTS "Enable the tests" ON)
+if (ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
 
 if (SKBUILD)
     add_subdirectory(python)
