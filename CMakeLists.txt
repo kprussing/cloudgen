@@ -20,6 +20,8 @@ if (${fc_LOADED} MATCHES NOTFOUND)
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchContent.cmake)
 endif()
 
+cmake_policy(PUSH)
+cmake_policy(SET CMP0074 NEW)
 find_package(FFTW 3.3.4 QUIET)
 if (NOT FFTW_FOUND)
     FetchContent_Declare(fftw_cmake
@@ -42,6 +44,7 @@ if (NOT FFTW_FOUND)
         DESTINATION ${INSTALL_CONFIGDIR}
     )
 endif()
+cmake_policy(POP)
 
 find_package(netCDF 4.7.3 REQUIRED)
 
